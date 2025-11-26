@@ -6,11 +6,10 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - APENAS MUDANÇAS NO GLOW/SHADOW] */
+        /* [ESTILOS OMITIDOS - ADIÇÕES E PEQUENAS ALTERAÇÕES NAS ANIMAÇÕES E RESULTADO] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
             --electric-blue: #3b82f6; 
-            --neon-shadow: 0 0 10px rgba(96, 165, 250, 0.4), 0 0 20px rgba(167, 139, 250, 0.2); /* Sombra de brilho neon */
         }
         body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         a { text-decoration: none; transition: 0.3s; }
@@ -27,62 +26,77 @@
         .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2); }
         #appContainer { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; padding-bottom: 80px; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        /* ALTERAÇÃO AQUI: ADICIONANDO NEON GLOW */
-        .card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-light); 
-            padding: 2.5rem; 
-            border-radius: 24px; 
-            width: 100%; 
-            backdrop-filter: blur(20px); 
-            box-shadow: var(--neon-shadow), 0 25px 50px rgba(0,0,0,0.5); /* ADICIONADA SOMBRA NEON */
-            margin-bottom: 30px; 
-            box-sizing: border-box; 
-        }
+        .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: #a78bfa; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: #a78bfa; }
-        .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } /* Alterado para ALL */
         .btn-connect { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-bottom: 10px; } 
-        .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; }
+        .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } /* Adicionado animação */
         .btn-create { background: var(--accent-gradient); color: #000; }
-        .btn-create:hover:not(:disabled) { opacity: 0.9; transform: scale(1.02); }
+        .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.4); } /* Adicionado animação */
         .btn-create:disabled { background: #333; color: #666; cursor: not-allowed; }
-        .success-box { margin-top: 20px; padding: 15px; background: rgba(167, 139, 250, 0.1); border: 1px solid #a78bfa; border-radius: 12px; text-align: center; display: none; }
-        .success-box a { color: #a78bfa; font-weight: bold; }
+
+        /* NOVO ESTILO: Container de sucesso inline */
+        .success-box { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: rgba(167, 139, 250, 0.1); 
+            border: 1px solid #a78bfa; 
+            border-radius: 12px; 
+            text-align: center; 
+            display: none; 
+            align-items: center; /* Alinha verticalmente */
+            justify-content: center; /* Centraliza horizontalmente */
+            gap: 10px; /* Espaçamento entre os itens */
+            flex-wrap: wrap; /* Quebra linha em telas pequenas */
+        }
+        .success-box p { margin: 0; font-weight: bold; }
+        .success-box a { 
+            color: #a78bfa; 
+            font-weight: bold; 
+            text-decoration: underline; 
+            transition: color 0.2s ease-in-out; /* Animação de cor */
+        }
+        .success-box a:hover { color: #8b5cf6; } /* Cor de hover */
+
         .tokens-section { width: 100%; margin-top: 20px; }
         .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: white; display: flex; align-items: center; gap: 10px; }
         .token-list { display: grid; gap: 15px; }
-        .token-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .token-card:hover { border-color: #a78bfa; background: rgba(255, 255, 255, 0.08); }
+        .token-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease-in-out; } /* Alterado para ALL */
+        .token-card:hover { border-color: #a78bfa; background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.2); } /* Adicionado animação */
         .token-info h3 { margin: 0; font-size: 1rem; color: white; }
         .token-info span { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
-        .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #a78bfa; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
-        .mini-btn:hover { background: #a78bfa; color: black; }
+        .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #a78bfa; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } /* Alterado para ALL */
+        .mini-btn:hover { background: #a78bfa; color: black; transform: scale(1.05); box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4); } /* Adicionado animação */
         .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 25px; background: rgba(2, 4, 16, 0.9); backdrop-filter: blur(10px); font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
         .creator-link { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .creator-link:hover { color: #fff; }
         .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: #a78bfa; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
-        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; }
+        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231,76,60,0.4); } /* Adicionado animação */
         
         /* Link do Explorer */
-        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); }
-        .explorer-link-full:hover { border-color: #60a5fa; color: white; }
+        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } /* Alterado para ALL */
+        .explorer-link-full:hover { border-color: #60a5fa; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(96,165,250,0.3); } /* Adicionado animação */
 
         /* Botão Faucet na lateral superior */
         .btn-faucet-header {
-            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: 0.3s;
-        }
-        .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-1px); }
+            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: all 0.2s ease-in-out; } /* Alterado para ALL */
+        .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(167, 139, 250, 0.5); } /* Adicionado animação */
 
         /* Aviso de Escolha de Carteira */
         .wallet-info-note {
             color: #d1d5db; font-size: 0.8rem; margin-bottom: 20px; padding: 10px; border-left: 3px solid #60a5fa; background: rgba(45, 55, 72, 0.2); border-radius: 0 4px 4px 0; line-height: 1.4;
         }
 
-        @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } .btn-faucet-header { position: relative; margin: 10px auto; right: auto; top: auto; } }
+        @media (max-width: 600px) { 
+            h1 { font-size: 2.5rem; } 
+            .footer-bar { flex-direction: column; gap: 10px; text-align: center; } 
+            .btn-faucet-header { position: relative; margin: 10px auto; right: auto; top: auto; } 
+            .success-box { flex-direction: column; } /* Garante que o sucesso se mantenha limpo em mobile */
+        }
     </style>
 </head>
 <body>
@@ -129,7 +143,7 @@
                 </div>
 
                 <div id="resultArea" class="success-box">
-                    <p style="margin: 0 0 10px 0;">🎉 <strong>Token Criado!</strong></p>
+                    <p>🎉 Token Criado!</p>
                     <a id="txLink" href="#" target="_blank">Ver no ArcScan ↗</a>
                 </div>
                 
@@ -243,7 +257,7 @@
                 }
                 
                 btn.innerText = "🚀 Criar Outro"; btn.disabled = false;
-                document.getElementById("resultArea").style.display = "block";
+                document.getElementById("resultArea").style.display = "flex"; // Alterado para 'flex'
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
                 log("Sucesso!");
                 
