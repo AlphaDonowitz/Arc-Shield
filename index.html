@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V25 - BLINDADO) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V27 - FINAL) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -179,8 +179,36 @@
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        // --- FUNÇÃO DE DESCONEXÃO ---
-        function disconnectWallet() { window.location.reload(); }
+        /* --- MUDANÇA V27: LIMPEZA COMPLETA DE SESSÃO --- */
+        function disconnectWallet() { 
+            const btn = document.getElementById("btnConnect");
+            btn.innerHTML = "🔌 Conectar Carteira";
+            btn.onclick = connectWallet;
+            btn.classList.remove('btn-disconnect');
+            
+            // Reseta formulário
+            const form = document.getElementById("formFields");
+            form.style.opacity = "0.5";
+            form.style.pointerEvents = "none";
+            document.getElementById("btnCreate").disabled = true;
+            document.getElementById("tokenName").value = "";
+            document.getElementById("tokenSymbol").value = "";
+            document.getElementById("tokenSupply").value = "";
+
+            // Oculta links e resultados
+            document.getElementById("explorerLink").style.display = "none";
+            document.getElementById("resultArea").style.display = "none";
+            document.getElementById("myTokensSection").style.display = "none";
+            
+            // CRÍTICO: Limpa a lista de tokens visualmente para o próximo usuário
+            document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
+
+            signer = null;
+            currentUserAddress = null;
+            factoryContract = null;
+
+            log("Carteira desconectada. Sessão limpa.");
+        }
 
         /* --- LOGICA BLOCKCHAIN --- */
         const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
@@ -199,15 +227,14 @@
                 try {
                     provider = new ethers.BrowserProvider(window.ethereum);
                     
-                    // --- SELEÇÃO FORÇADA DE CARTEIRA ---
+                    // FORÇA SELEÇÃO DE CARTEIRA
                     await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
                     await provider.send("eth_requestAccounts", []);
                     
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
-                    // --- VERIFICAÇÃO DE REDE (BÁSICA) ---
-                    // Se o código do contrato não existir, provavelmente rede errada.
+                    // VERIFICAÇÃO SIMPLES DE REDE
                     const code = await provider.getCode(contractAddress);
                     if (code === '0x') {
                         alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
@@ -233,7 +260,6 @@
 
                 } catch (error) { 
                     console.error(error);
-                    // Ignora erro se usuário fechar o modal
                     if(error.code !== 4001) log("Conexão cancelada ou erro."); 
                 }
             } else { alert("Instale a MetaMask!"); }
@@ -245,7 +271,6 @@
             const supply = document.getElementById("tokenSupply").value;
             const btn = document.getElementById("btnCreate");
 
-            // --- VALIDAÇÃO DE INPUT MELHORADA ---
             if(!name || !symbol || !supply) { alert("Preencha todos os campos!"); return; }
             if(supply <= 0) { alert("O Supply deve ser maior que zero!"); return; }
 
@@ -297,14 +322,6 @@
                  placeholder.remove();
              }
              document.getElementById("myTokensSection").style.display = "block";
-        }
-
-        async function fetchUserTokens() {
-             document.getElementById("loadingTokens").style.display = "none";
-             const listDiv = document.getElementById("tokensList");
-             if (listDiv.children.length === 0) {
-                 listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
-             }
         }
 
         async function watchToken(address, symbol) {
