@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V28 - PREMIUM) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V29 - FINAL & CLEAN) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -15,6 +15,7 @@
             --card-bg: rgba(255, 255, 255, 0.05); 
             --border-light: rgba(255, 255, 255, 0.15); 
             --danger: #e74c3c;
+            color-scheme: dark; /* Instrui o navegador a usar controles escuros por padrão */
         }
         body { 
             background-color: var(--bg-deep); 
@@ -42,12 +43,12 @@
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
 
-        /* --- NOVO BOTÃO HERO (PREMIUM) --- */
+        /* --- BOTÃO HERO (PREMIUM) --- */
         .btn-hero { 
-            background: var(--accent-color); /* Azul da Marca */
+            background: var(--accent-color); 
             color: white; 
             padding: 18px 40px; 
-            border-radius: 12px; /* Formato moderno (quadrado arredondado) */
+            border-radius: 12px; 
             font-weight: 700; 
             font-size: 1.1rem; 
             border: 1px solid rgba(255,255,255,0.1); 
@@ -56,33 +57,37 @@
             align-items: center; 
             gap: 12px; 
             transition: all 0.3s ease; 
-            box-shadow: 0 0 20px rgba(39, 117, 202, 0.15); /* Glow suave */
+            box-shadow: 0 0 20px rgba(39, 117, 202, 0.15); 
         }
         
         .btn-hero:hover { 
             transform: translateY(-3px); 
-            background: #206bc4; /* Azul levemente mais vibrante */
-            box-shadow: 0 10px 30px rgba(39, 117, 202, 0.4); /* Glow intenso */
+            background: #206bc4; 
+            box-shadow: 0 10px 30px rgba(39, 117, 202, 0.4); 
             letter-spacing: 0.5px; 
         }
 
-        /* Animação da seta */
-        .btn-hero span.arrow {
-            display: inline-block;
-            transition: transform 0.3s ease;
-        }
-        .btn-hero:hover span.arrow {
-            transform: translateX(5px); /* Move a seta */
-        }
+        .btn-hero span.arrow { display: inline-block; transition: transform 0.3s ease; }
+        .btn-hero:hover span.arrow { transform: translateX(5px); }
 
         #appContainer { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; padding-bottom: 80px; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
         .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        
+        /* --- INPUTS --- */
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: var(--accent-color); }
-        
+
+        /* MUDANÇA V29: Remove os spinners (setinhas brancas) do input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] { -moz-appearance: textfield; } /* Firefox */
+
         .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } 
         .btn-connect { background: transparent; border: 1px solid var(--border-light); color: white; margin-bottom: 10px; } 
         .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } 
@@ -219,7 +224,7 @@
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        /* --- DESCONEXÃO SUAVE (SEM RELOAD + LIMPEZA DE SESSÃO) --- */
+        /* --- DESCONEXÃO SUAVE --- */
         function disconnectWallet() { 
             const btn = document.getElementById("btnConnect");
             btn.innerHTML = "🔌 Conectar Carteira";
@@ -238,7 +243,7 @@
             document.getElementById("resultArea").style.display = "none";
             document.getElementById("myTokensSection").style.display = "none";
             
-            // Limpa lista para privacidade
+            // Limpa a lista
             document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
 
             signer = null;
@@ -265,7 +270,6 @@
                 try {
                     provider = new ethers.BrowserProvider(window.ethereum);
                     
-                    // FORÇA SELEÇÃO DE CARTEIRA
                     await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
                     await provider.send("eth_requestAccounts", []);
                     
