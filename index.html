@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V24 - Mantendo V23) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V25 - BLINDADO) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -133,7 +133,7 @@
                     <input type="text" id="tokenSymbol" placeholder="Ex: ARC">
 
                     <label>Supply Inicial</label>
-                    <input type="number" id="tokenSupply" placeholder="Ex: 1000000">
+                    <input type="number" id="tokenSupply" placeholder="Ex: 1000000" min="1">
 
                     <button id="btnCreate" class="btn-action btn-create" onclick="createToken()" disabled>🚀 Criar Token</button>
                 </div>
@@ -199,23 +199,27 @@
                 try {
                     provider = new ethers.BrowserProvider(window.ethereum);
                     
-                    // --- MUDANÇA CRÍTICA: FORÇA A SELEÇÃO DE CARTEIRA ---
-                    // Isso obriga a MetaMask a abrir o pop-up de contas novamente
+                    // --- SELEÇÃO FORÇADA DE CARTEIRA ---
                     await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
-                    
-                    // Após a permissão, pegamos a conta selecionada
                     await provider.send("eth_requestAccounts", []);
                     
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
-                    // --- Transforma o botão em Desconexão ---
+                    // --- VERIFICAÇÃO DE REDE (BÁSICA) ---
+                    // Se o código do contrato não existir, provavelmente rede errada.
+                    const code = await provider.getCode(contractAddress);
+                    if (code === '0x') {
+                        alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
+                        log("Erro: Contrato não encontrado (Rede errada?)");
+                        return;
+                    }
+                    
                     const btn = document.getElementById("btnConnect");
                     btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
                     btn.onclick = disconnectWallet; 
                     btn.classList.add('btn-disconnect'); 
                     
-                    // Atualiza o link do explorer
                     const explorerLink = document.getElementById("explorerLink");
                     explorerLink.href = `https://testnet.arcscan.app/address/${currentUserAddress}?tab=tokens`;
                     explorerLink.style.display = 'block';
@@ -228,7 +232,9 @@
                     log("Carteira conectada.");
 
                 } catch (error) { 
-                    log("Conexão cancelada ou erro: " + error.message); 
+                    console.error(error);
+                    // Ignora erro se usuário fechar o modal
+                    if(error.code !== 4001) log("Conexão cancelada ou erro."); 
                 }
             } else { alert("Instale a MetaMask!"); }
         }
@@ -239,7 +245,9 @@
             const supply = document.getElementById("tokenSupply").value;
             const btn = document.getElementById("btnCreate");
 
-            if(!name || !symbol || !supply) { alert("Preencha tudo!"); return; }
+            // --- VALIDAÇÃO DE INPUT MELHORADA ---
+            if(!name || !symbol || !supply) { alert("Preencha todos os campos!"); return; }
+            if(supply <= 0) { alert("O Supply deve ser maior que zero!"); return; }
 
             btn.innerText = "⏳ Processando..."; btn.disabled = true;
 
@@ -247,9 +255,8 @@
                 const tx = await factoryContract.createToken(name, symbol, supply);
                 log("Transação enviada... aguardando confirmação.");
                 
-                const receipt = await tx.wait(); // Espera a mineração
+                const receipt = await tx.wait(); 
                 
-                // --- INJEÇÃO IMEDIATA (para feedback) ---
                 if (receipt.logs) {
                     const event = receipt.logs.find(l => { try { return factoryContract.interface.parseLog(l).name === 'TokenCreated'; } catch(e){return false} });
                     if(event) {
@@ -265,12 +272,12 @@
                 
             } catch (error) { 
                 console.error(error); 
-                log("Erro: " + (error.reason || "Cancelado")); 
+                const reason = error.reason || "Transação cancelada ou falha";
+                log("Erro: " + reason); 
                 btn.innerText = "🚀 Criar Token"; btn.disabled = false; 
             }
         }
 
-        // --- FUNÇÃO DE INJEÇÃO (FEEDBACK IMEDIATO) ---
         function injectTokenToDashboard(address, name, symbol) {
              const listDiv = document.getElementById("tokensList");
              const card = document.createElement("div");
@@ -284,18 +291,15 @@
                      <button onclick="watchToken('${address}', '${symbol}')" class="mini-btn">🦊 Add</button>
                  </div>
              `;
-             listDiv.prepend(card); // Adiciona no topo
+             listDiv.prepend(card);
              const placeholder = listDiv.querySelector('p');
              if (placeholder && placeholder.innerText.includes('O histórico é carregado apenas')) {
-                 placeholder.remove(); // Remove o placeholder se houver
+                 placeholder.remove();
              }
              document.getElementById("myTokensSection").style.display = "block";
         }
 
-
-        // --- FUNÇÃO DE HISTÓRICO (PLACEHOLDER) ---
         async function fetchUserTokens() {
-             // Esta função foi desativada para evitar o erro RPC
              document.getElementById("loadingTokens").style.display = "none";
              const listDiv = document.getElementById("tokensList");
              if (listDiv.children.length === 0) {
