@@ -203,7 +203,7 @@
                 const tx = await factoryContract.createToken(name, symbol, supply);
                 log("Transação enviada... aguardando confirmação.");
                 
-                await tx.wait();
+                await tx.wait(); 
                 
                 btn.innerText = "🚀 Criar Outro"; btn.disabled = false;
                 document.getElementById("resultArea").style.display = "block";
