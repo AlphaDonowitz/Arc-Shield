@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - ADICIONADO APENAS explorer-link-full] */
+        /* [ESTILOS OMITIDOS - ADICIONADO NOVO ESTILO PARA O BOTÃO FAUCET] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
         }
@@ -52,7 +52,7 @@
         .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: #a78bfa; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
-        .btn-disconnect:hover { background: #c0392b !important; border-color: #c0392b !important; }
+        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; }
         
         /* NOVO ESTILO: Link do Explorer */
         .explorer-link-full {
@@ -63,13 +63,35 @@
             margin-bottom: 20px;
             border-radius: 12px;
             border: 1px solid var(--border-light);
-            color: #60a5fa; /* Azul claro */
+            color: #60a5fa; 
             font-weight: 600;
             background: rgba(0,0,0,0.2);
         }
         .explorer-link-full:hover {
             border-color: #60a5fa;
             color: white;
+        }
+
+        /* NOVO ESTILO: Botão Faucet */
+        .btn-faucet {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 800;
+            margin-bottom: 20px;
+            
+            /* Dourado/Amarelo para o dinheiro */
+            background: linear-gradient(45deg, #facc15, #eab308);
+            color: #1f2937; /* Cinza escuro */
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(250, 204, 20, 0.3);
+            transition: 0.3s;
+        }
+        .btn-faucet:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
         }
 
         @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } }
@@ -89,6 +111,10 @@
         </div>
 
         <div id="appContainer">
+            <a href="https://faucet.circle.com/" target="_blank" class="btn-faucet">
+                💰 Tirar USDC Testnet (Faucet Circle)
+            </a>
+            
             <div class="card">
                 <div style="text-align: center; margin-bottom: 25px;">
                     <h2 style="margin: 0;">Arc Factory</h2>
@@ -163,7 +189,6 @@
         
         let provider, signer, factoryContract;
         let currentUserAddress;
-        let RPC_BLOCK_LIMIT = 250000; // Mantido, mas não mais usado no connectWallet
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
@@ -187,8 +212,6 @@
                     
                     factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
                     log("Carteira conectada.");
-
-                    // NAO CHAMA fetchUserTokens para evitar o erro RPC
 
                 } catch (error) { log("Erro: " + error.message); }
             } else { alert("Instale a MetaMask!"); }
@@ -234,7 +257,6 @@
         // --- FUNÇÃO DE INJEÇÃO (FEEDBACK IMEDIATO) ---
         function injectTokenToDashboard(address, name, symbol) {
              const listDiv = document.getElementById("tokensList");
-             // Se a lista já tem tokens, ela já foi exibida. Apenas adiciona.
              const card = document.createElement("div");
              card.className = "token-card";
              card.innerHTML = `
@@ -256,9 +278,9 @@
         }
 
 
-        // --- FUNÇÃO DE HISTÓRICO (AGORA UM PLACEHOLDER) ---
+        // --- FUNÇÃO DE HISTÓRICO (PLACEHOLDER) ---
         async function fetchUserTokens() {
-             // Esta função foi desativada para evitar o erro RPC
+             // Função desativada para evitar o erro RPC
              document.getElementById("loadingTokens").style.display = "none";
              const listDiv = document.getElementById("tokensList");
              if (listDiv.children.length === 0) {
