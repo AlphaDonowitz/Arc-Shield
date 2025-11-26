@@ -6,10 +6,10 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - APENAS A SEÇÃO FAUCET MUDOU] */
+        /* [ESTILOS OMITIDOS - APENAS FAUCET E POSICIONAMENTO MUDARAM] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
-            --electric-blue: #3b82f6; /* Novo azul mais vibrante */
+            --electric-blue: #3b82f6; 
         }
         body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         a { text-decoration: none; transition: 0.3s; }
@@ -55,55 +55,51 @@
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; }
         
-        /* NOVO ESTILO: Link do Explorer */
-        .explorer-link-full {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            color: #60a5fa; 
-            font-weight: 600;
-            background: rgba(0,0,0,0.2);
-        }
-        .explorer-link-full:hover {
-            border-color: #60a5fa;
-            color: white;
-        }
+        /* Link do Explorer */
+        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); }
+        .explorer-link-full:hover { border-color: #60a5fa; color: white; }
 
-        /* ESTILO CORRIGIDO: Botão Faucet */
-        .btn-faucet {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: 800;
-            margin-bottom: 20px;
-            
-            /* Usamos o azul principal com um toque de brilho */
-            background: var(--electric-blue); 
+        /* NOVO ESTILO: Botão Faucet na lateral superior */
+        .btn-faucet-header {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
             color: white;
-            text-decoration: none;
-            /* Sombra sutil roxa para o efeito neon */
+            z-index: 10;
+            /* Usamos o gradiente principal */
+            background: var(--accent-gradient);
             box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3);
             transition: 0.3s;
-            border: 1px solid var(--electric-blue);
         }
-        .btn-faucet:hover {
-            transform: translateY(-2px);
-            background: #3c52a0;
-            opacity: 1;
+        .btn-faucet-header:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } }
+        @media (max-width: 600px) { 
+            h1 { font-size: 2.5rem; } 
+            .footer-bar { flex-direction: column; gap: 10px; text-align: center; } 
+            /* Move o botão Faucet para baixo em telas pequenas para evitar conflito com o badge */
+            .btn-faucet-header {
+                position: relative; 
+                margin: 10px auto; 
+                right: auto;
+                top: auto;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="hero">
+        <a href="https://faucet.circle.com/" target="_blank" class="btn-faucet-header">
+            Faucet
+        </a>
+        
         <a href="https://testnet.arcscan.app/" target="_blank" class="badge">
             <span class="dot"></span> Arc Testnet Live ↗
         </a>
@@ -115,10 +111,6 @@
         </div>
 
         <div id="appContainer">
-            <a href="https://faucet.circle.com/" target="_blank" class="btn-faucet">
-                💰 Tirar USDC Testnet (Faucet Circle)
-            </a>
-            
             <div class="card">
                 <div style="text-align: center; margin-bottom: 25px;">
                     <h2 style="margin: 0;">Arc Factory</h2>
