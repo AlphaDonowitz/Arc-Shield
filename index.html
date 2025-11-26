@@ -6,10 +6,11 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - SEM MUDANÇAS ESTRUTURAIS] */
+        /* [ESTILOS OMITIDOS - APENAS MUDANÇAS NO GLOW/SHADOW] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
             --electric-blue: #3b82f6; 
+            --neon-shadow: 0 0 10px rgba(96, 165, 250, 0.4), 0 0 20px rgba(167, 139, 250, 0.2); /* Sombra de brilho neon */
         }
         body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         a { text-decoration: none; transition: 0.3s; }
@@ -26,7 +27,18 @@
         .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2); }
         #appContainer { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; padding-bottom: 80px; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
+        /* ALTERAÇÃO AQUI: ADICIONANDO NEON GLOW */
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-light); 
+            padding: 2.5rem; 
+            border-radius: 24px; 
+            width: 100%; 
+            backdrop-filter: blur(20px); 
+            box-shadow: var(--neon-shadow), 0 25px 50px rgba(0,0,0,0.5); /* ADICIONADA SOMBRA NEON */
+            margin-bottom: 30px; 
+            box-sizing: border-box; 
+        }
         label { color: #a78bfa; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: #a78bfa; }
