@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V36 - RELOAD NUCLEAR) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V37 - GLOBAL) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -72,7 +72,6 @@
         .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         
-        /* INPUTS LIMPOS */
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: var(--accent-color); }
         input[type=number]::-webkit-inner-spin-button, 
@@ -119,6 +118,16 @@
             position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-color); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); transition: all 0.2s ease-in-out; } 
         .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(39, 117, 202, 0.5); } 
 
+        /* BOTÃO DE IDIOMA */
+        .btn-lang {
+            position: absolute; top: 25px; right: 105px; /* Ao lado do Faucet */
+            padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; 
+            color: white; z-index: 10; background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+            transition: all 0.2s ease-in-out; 
+        }
+        .btn-lang:hover { background: rgba(255,255,255,0.2); }
+
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231,76,60,0.4); }
 
@@ -126,6 +135,7 @@
             h1 { font-size: 2.5rem; } 
             .footer-bar { flex-direction: column; gap: 10px; text-align: center; } 
             .btn-faucet-header { position: relative; margin: 10px auto; right: auto; top: auto; } 
+            .btn-lang { position: relative; margin: 0 auto 10px auto; right: auto; top: auto; display: inline-block; }
             .success-box { flex-direction: column; } 
         }
     </style>
@@ -133,6 +143,7 @@
 <body>
 
     <div class="hero">
+        <button class="btn-lang" onclick="toggleLanguage()" id="btnLang">🇺🇸 EN</button>
         <a href="https://faucet.circle.com/" target="_blank" class="btn-faucet-header">
             Faucet
         </a>
@@ -143,10 +154,10 @@
 
         <div id="startScreen">
             <h1><span class="gradient-text">Arc</span> <span class="shield-gradient">Shield</span></h1>
-            <p class="hero-desc">Crie tokens com velocidade e segurança na Arc Testnet da Circle</p>
+            <p class="hero-desc" id="heroDesc">Crie tokens com velocidade e segurança na Arc Testnet da Circle</p>
             
             <button class="btn-hero" onclick="startApp()">
-                Começar Agora <span class="arrow">→</span>
+                <span id="btnStartText">Começar Agora</span> <span class="arrow">→</span>
             </button>
         </div>
 
@@ -156,26 +167,26 @@
                     <h2 style="margin: 0;">
                         <span class="gradient-text">Arc</span> <span class="shield-gradient">Shield</span>
                     </h2> 
-                    <p style="color: #64748b; font-size: 0.9rem;">Configure seu ativo digital</p>
+                    <p style="color: #64748b; font-size: 0.9rem;" id="appSubtitle">Configure seu ativo digital</p>
                 </div>
 
                 <button id="btnConnect" class="btn-action btn-connect" onclick="connectWallet()">🔌 Conectar Carteira</button>
 
                 <div id="formFields" style="opacity: 0.5; pointer-events: none;">
-                    <label>Nome do Projeto</label>
+                    <label id="lblProject">Nome do Projeto</label>
                     <input type="text" id="tokenName" placeholder="Ex: Arc Governance">
 
-                    <label>Símbolo (Ticker)</label>
+                    <label id="lblSymbol">Símbolo (Ticker)</label>
                     <input type="text" id="tokenSymbol" placeholder="Ex: ARC">
 
-                    <label>Supply Inicial</label>
+                    <label id="lblSupply">Supply Inicial</label>
                     <input type="number" id="tokenSupply" placeholder="Ex: 1000000" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
 
                     <button id="btnCreate" class="btn-action btn-create" onclick="createToken()" disabled>🚀 Criar Token</button>
                 </div>
 
                 <div id="resultArea" class="success-box">
-                    <p>🎉 Token Criado!</p>
+                    <p id="msgSuccess">🎉 Token Criado!</p>
                     <a id="txLink" href="#" target="_blank">Ver no ArcScan ↗</a>
                 </div>
                 
@@ -188,11 +199,11 @@
                 </a>
                 
                 <div class="section-title">
-                    📂 Meus Tokens Criados
+                    <span id="lblMyTokens">📂 Meus Tokens Criados</span>
                     <div id="loadingTokens" class="spinner" style="display:none;"></div>
                 </div>
                 <div id="tokensList" class="token-list">
-                    <p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>
+                    <p id="lblHistory" style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>
                 </div>
             </div>
         </div>
@@ -209,6 +220,94 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
+        /* --- SISTEMA DE TRADUÇÃO (V37) --- */
+        const translations = {
+            pt: {
+                heroDesc: "Crie tokens com velocidade e segurança na Arc Testnet da Circle",
+                btnStart: "Começar Agora",
+                appSubtitle: "Configure seu ativo digital",
+                btnConnect: "🔌 Conectar Carteira",
+                btnDisconnect: "Desconectar",
+                lblProject: "NOME DO PROJETO",
+                lblSymbol: "SÍMBOLO (TICKER)",
+                lblSupply: "SUPPLY INICIAL",
+                btnCreate: "🚀 Criar Token",
+                btnCreateAnother: "🚀 Criar Outro",
+                btnProcessing: "⏳ Processando...",
+                msgSuccess: "🎉 Token Criado!",
+                viewExplorer: "Ver no ArcScan ↗",
+                lblMyTokens: "📂 Meus Tokens Criados",
+                lblHistory: "O histórico é carregado apenas durante a sessão atual.",
+                viewMyTokens: "🌐 Ver Meus Tokens no Explorer"
+            },
+            en: {
+                heroDesc: "Deploy tokens with speed and security on Circle's Arc Testnet",
+                btnStart: "Start Now",
+                appSubtitle: "Configure your digital asset",
+                btnConnect: "🔌 Connect Wallet",
+                btnDisconnect: "Disconnect",
+                lblProject: "PROJECT NAME",
+                lblSymbol: "SYMBOL (TICKER)",
+                lblSupply: "INITIAL SUPPLY",
+                btnCreate: "🚀 Deploy Token",
+                btnCreateAnother: "🚀 Deploy Another",
+                btnProcessing: "⏳ Deploying...",
+                msgSuccess: "🎉 Token Deployed!",
+                viewExplorer: "View on ArcScan ↗",
+                lblMyTokens: "📂 Created Tokens",
+                lblHistory: "History is loaded for current session only.",
+                viewMyTokens: "🌐 View My Tokens on Explorer"
+            }
+        };
+
+        let currentLang = 'pt'; // Padrão
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            // Atualiza Textos
+            document.getElementById('heroDesc').innerText = t.heroDesc;
+            document.getElementById('btnStartText').innerText = t.btnStart;
+            document.getElementById('appSubtitle').innerText = t.appSubtitle;
+            document.getElementById('lblProject').innerText = t.lblProject;
+            document.getElementById('lblSymbol').innerText = t.lblSymbol;
+            document.getElementById('lblSupply').innerText = t.lblSupply;
+            
+            // Botões dinâmicos (precisa checar estado)
+            const btnCreate = document.getElementById('btnCreate');
+            if (!btnCreate.disabled && btnCreate.innerText.includes('Criar')) btnCreate.innerText = t.btnCreate;
+            
+            const btnConnect = document.getElementById('btnConnect');
+            if (!btnConnect.classList.contains('btn-disconnect')) btnConnect.innerText = t.btnConnect;
+
+            document.getElementById('msgSuccess').innerText = t.msgSuccess;
+            document.getElementById('txLink').innerText = t.viewExplorer;
+            document.getElementById('lblMyTokens').innerText = t.lblMyTokens;
+            document.getElementById('explorerLink').innerText = t.viewMyTokens;
+
+            const hist = document.getElementById('lblHistory');
+            if(hist) hist.innerText = t.lblHistory;
+
+            // Atualiza Botão de Idioma
+            const btnLang = document.getElementById('btnLang');
+            btnLang.innerText = lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT';
+        }
+
+        function toggleLanguage() {
+            setLanguage(currentLang === 'pt' ? 'en' : 'pt');
+        }
+
+        /* --- DETECÇÃO AUTOMÁTICA --- */
+        // Roda antes do window.onload para evitar "flash" de idioma errado
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang.startsWith('en')) {
+            setLanguage('en');
+        } else {
+            setLanguage('pt');
+        }
+
+        /* --- LÓGICA DAPP (Mantida da V36) --- */
         let provider, signer, factoryContract;
         let currentUserAddress;
         
@@ -218,13 +317,10 @@
             { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "type": "event" }
         ];
 
-        /* --- VERIFICAÇÃO AUTOMÁTICA AO RECARREGAR --- */
         window.onload = async function() {
-            // Se o usuário já estiver conectado (pós-reload ou persistência), ajustamos a UI
             if (window.ethereum) {
                  const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                  if (accounts && accounts.length > 0) {
-                     // Usuário já conectado, apenas exibe o app
                      startApp();
                      setupConnection(accounts[0]);
                  }
@@ -238,24 +334,17 @@
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
-        /* --- CONEXÃO COM PEDIDO DE PERMISSÃO --- */
         async function connectWallet() {
             if (!window.ethereum) { alert("Instale a MetaMask!"); return; }
-
             try {
-                // Força o popup de escolha
                 await window.ethereum.request({
                     method: "wallet_requestPermissions",
                     params: [{ eth_accounts: {} }]
                 });
-                
-                // Pega a conta escolhida
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
                 if (accounts && accounts.length > 0) {
                     setupConnection(accounts[0]);
                 }
-
             } catch (error) {
                 console.error("Erro Conexão:", error);
                 if (error.code === 4001) log("Seleção cancelada.");
@@ -270,9 +359,9 @@
             signer = await provider.getSigner();
             factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-            // UI
             const btn = document.getElementById("btnConnect");
-            btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
+            const t = translations[currentLang];
+            btn.innerHTML = `${t.btnDisconnect} (${currentUserAddress.slice(0,6)}...)`;
             btn.onclick = disconnectWallet; 
             btn.classList.add('btn-disconnect'); 
             
@@ -282,26 +371,21 @@
 
             document.getElementById("formFields").style.opacity = "1";
             document.getElementById("formFields").style.pointerEvents = "all";
-            document.getElementById("btnCreate").disabled = false;
+            
+            const btnCreate = document.getElementById("btnCreate");
+            btnCreate.disabled = false;
+            btnCreate.innerText = t.btnCreate; // Reseta texto se estava em "Processando"
         }
 
-        /* --- DESCONEXÃO NUCLEAR (REVOKE + RELOAD) --- */
         async function disconnectWallet() { 
-            // 1. Tenta revogar a permissão no nível da carteira
             try {
                 await window.ethereum.request({
                     method: "wallet_revokePermissions",
                     params: [{ eth_accounts: {} }]
                 });
-            } catch (e) {
-                console.log("Revoke não suportado pela carteira, seguindo para limpeza.");
-            }
-
-            // 2. Limpa todos os caches locais do navegador
+            } catch (e) { console.log("Revoke ignored"); }
             localStorage.clear();
             sessionStorage.clear();
-
-            // 3. RELOAD DA PÁGINA (O Segredo para limpar a memória RAM da extensão)
             window.location.reload();
         }
 
@@ -310,11 +394,12 @@
             const symbol = document.getElementById("tokenSymbol").value;
             const supply = document.getElementById("tokenSupply").value;
             const btn = document.getElementById("btnCreate");
+            const t = translations[currentLang];
 
             if(!name || !symbol || !supply) { alert("Preencha todos os campos!"); return; }
             if(supply <= 0) { alert("O Supply deve ser maior que zero!"); return; }
 
-            btn.innerText = "⏳ Processando..."; btn.disabled = true;
+            btn.innerText = t.btnProcessing; btn.disabled = true;
 
             try {
                 const tx = await factoryContract.createToken(name, symbol, supply);
@@ -330,7 +415,7 @@
                     }
                 }
                 
-                btn.innerText = "🚀 Criar Outro"; btn.disabled = false;
+                btn.innerText = t.btnCreateAnother; btn.disabled = false;
                 document.getElementById("resultArea").style.display = "flex"; 
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
                 log("Sucesso!");
@@ -339,7 +424,7 @@
                 console.error(error); 
                 const reason = error.reason || "Transação cancelada ou falha";
                 log("Erro: " + reason); 
-                btn.innerText = "🚀 Criar Token"; btn.disabled = false; 
+                btn.innerText = t.btnCreate; btn.disabled = false; 
             }
         }
 
@@ -357,10 +442,11 @@
                  </div>
              `;
              listDiv.prepend(card);
-             const placeholder = listDiv.querySelector('p');
-             if (placeholder && placeholder.innerText.includes('O histórico é carregado apenas')) {
-                 placeholder.remove();
-             }
+             
+             // Remove placeholder se existir
+             const placeholder = document.getElementById('lblHistory');
+             if (placeholder) placeholder.style.display = 'none';
+             
              document.getElementById("myTokensSection").style.display = "block";
         }
 
