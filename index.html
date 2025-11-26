@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - SEM MUDANÇAS] */
+        /* [ESTILOS OMITIDOS - SEM MUDANÇAS ESTRUTURAIS] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
             --electric-blue: #3b82f6; 
@@ -125,8 +125,8 @@
             </div>
 
             <div class="tokens-section" id="myTokensSection" style="display:none;">
-                <a href="https://testnet.arcscan.app/address/0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a" target="_blank" class="explorer-link-full">
-                    🌐 Ver Todos os Tokens (Explorer)
+                <a id="explorerLink" href="#" target="_blank" class="explorer-link-full">
+                    🌐 Ver Meus Tokens no Explorer
                 </a>
                 
                 <div class="section-title">
@@ -186,7 +186,12 @@
                     btn.onclick = disconnectWallet; 
                     btn.classList.add('btn-disconnect'); 
                     
-                    // Oculta o aviso de escolha de carteira
+                    // --- MUDANÇA V17: ATUALIZA O LINK DO EXPLORER ---
+                    const explorerLink = document.getElementById("explorerLink");
+                    explorerLink.href = `https://testnet.arcscan.app/address/${currentUserAddress}?tab=tokens`;
+                    explorerLink.style.display = 'block'; // Garante que o link apareça após a conexão
+                    
+                    // Oculta o aviso de escolha de carteira após a conexão
                     document.getElementById('walletNote').style.display = 'none';
 
                     document.getElementById("formFields").style.opacity = "1";
@@ -253,7 +258,7 @@
              `;
              listDiv.prepend(card); // Adiciona no topo
              const placeholder = listDiv.querySelector('p');
-             if (placeholder && placeholder.innerText.includes('Nenhum token encontrado')) {
+             if (placeholder && placeholder.innerText.includes('O histórico é carregado apenas')) {
                  placeholder.remove(); // Remove o placeholder se houver
              }
              document.getElementById("myTokensSection").style.display = "block";
