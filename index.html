@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V34 - FORÇA BRUTA) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V35 - FINAL) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -72,7 +72,7 @@
         .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         
-        /* INPUTS BLINDADOS */
+        /* INPUTS LIMPOS */
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: var(--accent-color); }
         input[type=number]::-webkit-inner-spin-button, 
@@ -209,11 +209,93 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
+        // Variáveis Globais
+        let provider, signer, factoryContract;
+        let currentUserAddress;
+        
+        // Contrato Info
+        const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
+        const contractABI = [
+            { "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "initialSupply", "type": "uint256" } ], "name": "createToken", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+            { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "type": "event" }
+        ];
+
+        /* --- INICIALIZAÇÃO E EVENT LISTENERS --- */
+        window.onload = function() {
+            if (window.ethereum) {
+                // Se o usuário trocar a conta na carteira, atualizamos a UI
+                window.ethereum.on('accountsChanged', function (accounts) {
+                    if (accounts.length > 0) {
+                        handleLoginSuccess(accounts[0]);
+                    } else {
+                        disconnectWallet();
+                    }
+                });
+            }
+        };
+
         function startApp() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('appContainer').style.display = 'flex';
         }
 
+        function log(msg) { document.getElementById("console").innerText = msg; }
+
+        /* --- CONEXÃO RPC PURA (BYPASS ETHERS) --- */
+        async function connectWallet() {
+            if (!window.ethereum) { alert("Instale a MetaMask!"); return; }
+
+            try {
+                // 1. SOLICITAÇÃO FORÇADA DE PERMISSÕES
+                // Isso DEVE abrir o popup. Se não abrir, a carteira está bloqueando.
+                await window.ethereum.request({
+                    method: "wallet_requestPermissions",
+                    params: [{ eth_accounts: {} }]
+                });
+                
+                // 2. RECUPERAÇÃO DA CONTA SELECIONADA
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                if (accounts && accounts.length > 0) {
+                    handleLoginSuccess(accounts[0]);
+                }
+
+            } catch (error) {
+                console.error("Erro Conexão:", error);
+                if (error.code === 4001) {
+                    log("Seleção cancelada.");
+                } else {
+                    log("Erro: " + error.message);
+                }
+            }
+        }
+
+        /* --- LÓGICA DE SUCESSO DE LOGIN --- */
+        async function handleLoginSuccess(address) {
+            currentUserAddress = address;
+            log("Conectado: " + currentUserAddress);
+
+            // Agora sim instanciamos o Ethers APENAS para o contrato
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            // Atualiza UI
+            const btn = document.getElementById("btnConnect");
+            btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
+            btn.onclick = disconnectWallet; 
+            btn.classList.add('btn-disconnect'); 
+            
+            const explorerLink = document.getElementById("explorerLink");
+            explorerLink.href = `https://testnet.arcscan.app/address/${currentUserAddress}?tab=tokens`;
+            explorerLink.style.display = 'block';
+
+            document.getElementById("formFields").style.opacity = "1";
+            document.getElementById("formFields").style.pointerEvents = "all";
+            document.getElementById("btnCreate").disabled = false;
+        }
+
+        /* --- DESCONEXÃO (RESET VISUAL) --- */
         function disconnectWallet() { 
             const btn = document.getElementById("btnConnect");
             btn.innerHTML = "🔌 Conectar Carteira";
@@ -232,90 +314,14 @@
             document.getElementById("myTokensSection").style.display = "none";
             document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
 
-            if (provider) provider = null;
+            // Limpeza
+            provider = null;
             signer = null;
             currentUserAddress = null;
             factoryContract = null;
-            
             try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
-            log("Carteira desconectada. Cache limpo.");
-        }
 
-        const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
-        const contractABI = [
-            { "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "initialSupply", "type": "uint256" } ], "name": "createToken", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-            { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "type": "event" }
-        ];
-        
-        let provider, signer, factoryContract;
-        let currentUserAddress;
-
-        function log(msg) { document.getElementById("console").innerText = msg; }
-
-        /* --- CONEXÃO FORÇA BRUTA (V34) --- */
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    // Passo 1: PEDIR PERMISSÃO EXPLICITAMENTE (Ignora providers complexos, vai no global)
-                    // Isso deve abrir o popup da MetaMask/Rabby forçando a escolha
-                    console.log("Tentando wallet_requestPermissions...");
-                    await window.ethereum.request({
-                        method: "wallet_requestPermissions",
-                        params: [{ eth_accounts: {} }]
-                    });
-
-                    // Passo 2: REQUISITAR CONTAS APÓS A PERMISSÃO
-                    console.log("Tentando eth_requestAccounts...");
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
-                    if (!accounts || accounts.length === 0) {
-                        alert("Nenhuma conta selecionada.");
-                        return;
-                    }
-                    
-                    // Passo 3: CONFIGURAR ETHERS COM A CONTA SELECIONADA
-                    // Usamos a conta[0] explicitamente retornada pelo passo anterior
-                    currentUserAddress = accounts[0];
-                    console.log("Conta selecionada:", currentUserAddress);
-
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    signer = await provider.getSigner();
-                    
-                    // Validação de Rede
-                    const code = await provider.getCode(contractAddress);
-                    if (code === '0x') {
-                        alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
-                        log("Erro: Contrato não encontrado (Rede errada?)");
-                        return;
-                    }
-                    
-                    // UI Update
-                    const btn = document.getElementById("btnConnect");
-                    btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
-                    btn.onclick = disconnectWallet; 
-                    btn.classList.add('btn-disconnect'); 
-                    
-                    const explorerLink = document.getElementById("explorerLink");
-                    explorerLink.href = `https://testnet.arcscan.app/address/${currentUserAddress}?tab=tokens`;
-                    explorerLink.style.display = 'block';
-
-                    document.getElementById("formFields").style.opacity = "1";
-                    document.getElementById("formFields").style.pointerEvents = "all";
-                    document.getElementById("btnCreate").disabled = false;
-                    
-                    factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
-                    log("Conectado: " + currentUserAddress);
-
-                } catch (error) { 
-                    console.error("DEBUG Erro:", error);
-                    // Erro 4001 = Usuário rejeitou o popup
-                    if (error.code === 4001) {
-                        log("Seleção cancelada pelo usuário.");
-                    } else {
-                        log("Erro na conexão. Verifique o console.");
-                    }
-                }
-            } else { alert("Instale a MetaMask!"); }
+            log("Desconectado.");
         }
 
         async function createToken() {
@@ -375,14 +381,6 @@
                  placeholder.remove();
              }
              document.getElementById("myTokensSection").style.display = "block";
-        }
-
-        async function fetchUserTokens() {
-             document.getElementById("loadingTokens").style.display = "none";
-             const listDiv = document.getElementById("tokensList");
-             if (listDiv.children.length === 0) {
-                 listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
-             }
         }
 
         async function watchToken(address, symbol) {
