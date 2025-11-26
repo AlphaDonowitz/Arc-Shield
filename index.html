@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V31 - FINAL GOLD) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V32 - BARE METAL FIX) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -36,7 +36,6 @@
         
         h1 { font-size: 3.5rem; line-height: 1; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -2px; text-align: center; }
         
-        /* Branding */
         .gradient-text { color: var(--text-main); } 
         .shield-gradient { color: var(--accent-color); } 
 
@@ -74,11 +73,10 @@
         .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         
-        /* --- INPUTS BLINDADOS --- */
+        /* --- INPUTS --- */
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: var(--accent-color); }
         
-        /* Remove setas visuais */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -240,6 +238,8 @@
             
             document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
 
+            // Zera as variáveis globais
+            if (provider) provider = null; // IMPORTANTE
             signer = null;
             currentUserAddress = null;
             factoryContract = null;
@@ -262,15 +262,20 @@
         async function connectWallet() {
             if (window.ethereum) {
                 try {
+                    // --- MUDANÇA V32: CHAMADA DIRETA AO WINDOW.ETHEREUM ---
+                    // Isso evita que o Ethers.js tente gerenciar o estado da conexão.
+                    // Pedimos explicitamente para a carteira pedir permissões de contas.
+                    await window.ethereum.request({
+                        method: "wallet_requestPermissions",
+                        params: [{ eth_accounts: {} }]
+                    });
+
+                    // Depois que a permissão é dada, instanciamos o provider
                     provider = new ethers.BrowserProvider(window.ethereum);
-                    
-                    // --- FORÇA O POP-UP DE SELEÇÃO DE CONTAS ---
-                    await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
-                    await provider.send("eth_requestAccounts", []);
-                    
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
+                    // Verificação de Rede
                     const code = await provider.getCode(contractAddress);
                     if (code === '0x') {
                         alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
@@ -278,6 +283,7 @@
                         return;
                     }
                     
+                    // Atualiza UI
                     const btn = document.getElementById("btnConnect");
                     btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
                     btn.onclick = disconnectWallet; 
@@ -292,11 +298,15 @@
                     document.getElementById("btnCreate").disabled = false;
                     
                     factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
-                    log("Carteira conectada.");
+                    log("Carteira conectada: " + currentUserAddress);
 
                 } catch (error) { 
-                    console.error("Erro ao conectar:", error);
-                    log("Conexão cancelada pelo usuário."); 
+                    console.error("Erro Conexão:", error);
+                    if (error.code === 4001) {
+                        log("Conexão cancelada pelo usuário.");
+                    } else {
+                        log("Erro ao conectar (Verifique Console).");
+                    }
                 }
             } else { alert("Instale a MetaMask!"); }
         }
