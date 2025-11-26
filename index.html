@@ -6,15 +6,12 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V23) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V24 - Mantendo V23) --- */
         :root {
-            --bg-deep: #0A0A0A; /* Preto Profundo */
-            --text-main: #ffffff; /* Branco */
-            --text-muted: #94a3b8; /* Off-White/Cinza */
-            
-            /* ÚNICA COR FORTE: USDC Blue */
-            --accent-color: #2775CA; 
-            
+            --bg-deep: #0A0A0A; 
+            --text-main: #ffffff; 
+            --text-muted: #94a3b8; 
+            --accent-color: #2775CA; /* USDC Blue */
             --card-bg: rgba(255, 255, 255, 0.05); 
             --border-light: rgba(255, 255, 255, 0.15); 
             --danger: #e74c3c;
@@ -36,9 +33,9 @@
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
         h1 { font-size: 3.5rem; line-height: 1; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -2px; text-align: center; }
         
-        /* CLASSES DE MARCA (Branding) */
-        .gradient-text { color: var(--text-main); } /* Arc (Branco) */
-        .shield-gradient { color: var(--accent-color); } /* Shield (Azul USDC) */
+        /* Branding */
+        .gradient-text { color: var(--text-main); } 
+        .shield-gradient { color: var(--accent-color); } 
 
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
@@ -53,13 +50,10 @@
         .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } 
         .btn-connect { background: transparent; border: 1px solid var(--border-light); color: white; margin-bottom: 10px; } 
         .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } 
-        
-        /* Botão Principal - USDC Blue */
         .btn-create { background: var(--accent-color); color: white; }
         .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.6); } 
         .btn-create:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-        /* Container de sucesso inline */
         .success-box { 
             margin-top: 20px; padding: 15px; 
             background: rgba(39, 117, 202, 0.1); 
@@ -68,10 +62,7 @@
             align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
         }
         .success-box p { margin: 0; font-weight: bold; }
-        .success-box a { 
-            color: var(--accent-color); 
-            font-weight: bold; text-decoration: underline; transition: color 0.2s ease-in-out; 
-        }
+        .success-box a { color: var(--accent-color); font-weight: bold; text-decoration: underline; transition: color 0.2s ease-in-out; }
         .success-box a:hover { color: #5cb8ff; } 
 
         .tokens-section { width: 100%; margin-top: 20px; }
@@ -88,19 +79,15 @@
         .creator-link:hover { color: #fff; }
         .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         
-        /* Link do Explorer */
         .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: var(--accent-color); font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } 
         .explorer-link-full:hover { border-color: var(--accent-color); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); } 
 
-        /* Botão Faucet */
         .btn-faucet-header {
             position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-color); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); transition: all 0.2s ease-in-out; } 
         .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(39, 117, 202, 0.5); } 
 
-        /* Aviso de Escolha de Carteira */
-        .wallet-info-note {
-            color: var(--text-muted); font-size: 0.8rem; margin-bottom: 20px; padding: 10px; border-left: 3px solid var(--accent-color); background: rgba(45, 55, 72, 0.2); border-radius: 0 4px 4px 0; line-height: 1.4;
-        }
+        .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231,76,60,0.4); }
 
         @media (max-width: 600px) { 
             h1 { font-size: 2.5rem; } 
@@ -137,10 +124,6 @@
                 </div>
 
                 <button id="btnConnect" class="btn-action btn-connect" onclick="connectWallet()">🔌 Conectar Carteira</button>
-
-                <p class="wallet-info-note" id="walletNote">
-                    Se deseja usar uma conta diferente, altere a conta ativa diretamente na sua extensão de carteira antes de clicar em "Conectar Carteira".
-                </p>
 
                 <div id="formFields" style="opacity: 0.5; pointer-events: none;">
                     <label>Nome do Projeto</label>
@@ -215,7 +198,14 @@
             if (window.ethereum) {
                 try {
                     provider = new ethers.BrowserProvider(window.ethereum);
+                    
+                    // --- MUDANÇA CRÍTICA: FORÇA A SELEÇÃO DE CARTEIRA ---
+                    // Isso obriga a MetaMask a abrir o pop-up de contas novamente
+                    await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
+                    
+                    // Após a permissão, pegamos a conta selecionada
                     await provider.send("eth_requestAccounts", []);
+                    
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
@@ -225,13 +215,10 @@
                     btn.onclick = disconnectWallet; 
                     btn.classList.add('btn-disconnect'); 
                     
-                    // --- MUDANÇA V17: ATUALIZA O LINK DO EXPLORER ---
+                    // Atualiza o link do explorer
                     const explorerLink = document.getElementById("explorerLink");
                     explorerLink.href = `https://testnet.arcscan.app/address/${currentUserAddress}?tab=tokens`;
-                    explorerLink.style.display = 'block'; // Garante que o link apareça após a conexão
-                    
-                    // Oculta o aviso de escolha de carteira após a conexão
-                    document.getElementById('walletNote').style.display = 'none';
+                    explorerLink.style.display = 'block';
 
                     document.getElementById("formFields").style.opacity = "1";
                     document.getElementById("formFields").style.pointerEvents = "all";
@@ -240,7 +227,9 @@
                     factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
                     log("Carteira conectada.");
 
-                } catch (error) { log("Erro: " + error.message); }
+                } catch (error) { 
+                    log("Conexão cancelada ou erro: " + error.message); 
+                }
             } else { alert("Instale a MetaMask!"); }
         }
 
