@@ -6,9 +6,10 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - ADICIONADO NOVO ESTILO PARA O BOTÃO FAUCET] */
+        /* [ESTILOS OMITIDOS - APENAS A SEÇÃO FAUCET MUDOU] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
+            --electric-blue: #3b82f6; /* Novo azul mais vibrante */
         }
         body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         a { text-decoration: none; transition: 0.3s; }
@@ -72,7 +73,7 @@
             color: white;
         }
 
-        /* NOVO ESTILO: Botão Faucet */
+        /* ESTILO CORRIGIDO: Botão Faucet */
         .btn-faucet {
             display: block;
             width: 100%;
@@ -82,16 +83,19 @@
             font-weight: 800;
             margin-bottom: 20px;
             
-            /* Dourado/Amarelo para o dinheiro */
-            background: linear-gradient(45deg, #facc15, #eab308);
-            color: #1f2937; /* Cinza escuro */
+            /* Usamos o azul principal com um toque de brilho */
+            background: var(--electric-blue); 
+            color: white;
             text-decoration: none;
-            box-shadow: 0 5px 15px rgba(250, 204, 20, 0.3);
+            /* Sombra sutil roxa para o efeito neon */
+            box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3);
             transition: 0.3s;
+            border: 1px solid var(--electric-blue);
         }
         .btn-faucet:hover {
             transform: translateY(-2px);
-            opacity: 0.9;
+            background: #3c52a0;
+            opacity: 1;
         }
 
         @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } }
@@ -154,7 +158,7 @@
                     <div id="loadingTokens" class="spinner" style="display:none;"></div>
                 </div>
                 <div id="tokensList" class="token-list">
-                    <p style="color: #64748b; font-size: 0.9rem; text-align: center;">Nenhum token encontrado nesta carteira.</p>
+                    <p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>
                 </div>
             </div>
         </div>
@@ -280,7 +284,7 @@
 
         // --- FUNÇÃO DE HISTÓRICO (PLACEHOLDER) ---
         async function fetchUserTokens() {
-             // Função desativada para evitar o erro RPC
+             // Esta função foi desativada para evitar o erro RPC
              document.getElementById("loadingTokens").style.display = "none";
              const listDiv = document.getElementById("tokensList");
              if (listDiv.children.length === 0) {
