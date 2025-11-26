@@ -6,25 +6,11 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [Estilos e CSS INALTERADOS - OMITIDOS POR BREVIDADE] */
+        /* [ESTILOS OMITIDOS - ADICIONADO APENAS explorer-link-full] */
         :root {
-            --bg-deep: #020410;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa);
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --border-light: rgba(255, 255, 255, 0.1);
-            --danger: #e74c3c;
+            --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
         }
-        body {
-            background-color: var(--bg-deep);
-            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+        body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         a { text-decoration: none; transition: 0.3s; }
         .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; transition: opacity 0.5s ease; position: relative; box-sizing: border-box; }
         .badge { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 24px; backdrop-filter: blur(5px); color: white; cursor: pointer; }
@@ -67,6 +53,25 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         .btn-disconnect:hover { background: #c0392b !important; border-color: #c0392b !important; }
+        
+        /* NOVO ESTILO: Link do Explorer */
+        .explorer-link-full {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            color: #60a5fa; /* Azul claro */
+            font-weight: 600;
+            background: rgba(0,0,0,0.2);
+        }
+        .explorer-link-full:hover {
+            border-color: #60a5fa;
+            color: white;
+        }
+
         @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } }
     </style>
 </head>
@@ -114,6 +119,10 @@
             </div>
 
             <div class="tokens-section" id="myTokensSection" style="display:none;">
+                <a href="https://testnet.arcscan.app/address/0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a" target="_blank" class="explorer-link-full">
+                    🌐 Ver Todos os Tokens (Explorer)
+                </a>
+                
                 <div class="section-title">
                     📂 Meus Tokens Criados
                     <div id="loadingTokens" class="spinner" style="display:none;"></div>
@@ -142,10 +151,8 @@
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        // --- FUNÇÃO DE DESCONEXÃO (JÁ CORRIGIDA) ---
-        function disconnectWallet() {
-            window.location.reload(); 
-        }
+        // --- FUNÇÃO DE DESCONEXÃO ---
+        function disconnectWallet() { window.location.reload(); }
 
         /* --- LOGICA BLOCKCHAIN --- */
         const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
@@ -156,7 +163,7 @@
         
         let provider, signer, factoryContract;
         let currentUserAddress;
-        let RPC_BLOCK_LIMIT = 250000; // Limite para otimizar o queryFilter
+        let RPC_BLOCK_LIMIT = 250000; // Mantido, mas não mais usado no connectWallet
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
@@ -168,20 +175,20 @@
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
-                    // --- MUDANÇA: Transforma o botão em Desconexão ---
+                    // --- Transforma o botão em Desconexão ---
                     const btn = document.getElementById("btnConnect");
                     btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
-                    btn.onclick = disconnectWallet; // NOVO: Muda o handler
-                    btn.classList.add('btn-disconnect'); // Adiciona estilo vermelho
+                    btn.onclick = disconnectWallet; 
+                    btn.classList.add('btn-disconnect'); 
                     
                     document.getElementById("formFields").style.opacity = "1";
                     document.getElementById("formFields").style.pointerEvents = "all";
                     document.getElementById("btnCreate").disabled = false;
                     
                     factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
-                    log("Carteira conectada. Carregando histórico...");
+                    log("Carteira conectada.");
 
-                    fetchUserTokens();
+                    // NAO CHAMA fetchUserTokens para evitar o erro RPC
 
                 } catch (error) { log("Erro: " + error.message); }
             } else { alert("Instale a MetaMask!"); }
@@ -203,7 +210,7 @@
                 
                 const receipt = await tx.wait(); // Espera a mineração
                 
-                // --- NOVO: INJEÇÃO IMEDIATA (para feedback) ---
+                // --- INJEÇÃO IMEDIATA (para feedback) ---
                 if (receipt.logs) {
                     const event = receipt.logs.find(l => { try { return factoryContract.interface.parseLog(l).name === 'TokenCreated'; } catch(e){return false} });
                     if(event) {
@@ -217,9 +224,6 @@
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
                 log("Sucesso!");
                 
-                // Carrega histórico completo em background
-                fetchUserTokens(); 
-
             } catch (error) { 
                 console.error(error); 
                 log("Erro: " + (error.reason || "Cancelado")); 
@@ -227,9 +231,10 @@
             }
         }
 
-        // --- FUNÇÃO DE INJEÇÃO (PARA FEEDBACK IMEDIATO) ---
+        // --- FUNÇÃO DE INJEÇÃO (FEEDBACK IMEDIATO) ---
         function injectTokenToDashboard(address, name, symbol) {
              const listDiv = document.getElementById("tokensList");
+             // Se a lista já tem tokens, ela já foi exibida. Apenas adiciona.
              const card = document.createElement("div");
              card.className = "token-card";
              card.innerHTML = `
@@ -244,46 +249,21 @@
              `;
              listDiv.prepend(card); // Adiciona no topo
              const placeholder = listDiv.querySelector('p');
-             if (placeholder) placeholder.remove(); // Remove o placeholder "Nenhum token encontrado"
+             if (placeholder && placeholder.innerText.includes('Nenhum token encontrado')) {
+                 placeholder.remove(); // Remove o placeholder se houver
+             }
              document.getElementById("myTokensSection").style.display = "block";
         }
 
 
-        // --- FUNÇÃO PARA BUSCAR HISTÓRICO (AGORA OTIMIZADA) ---
+        // --- FUNÇÃO DE HISTÓRICO (AGORA UM PLACEHOLDER) ---
         async function fetchUserTokens() {
-            if(!factoryContract || !currentUserAddress) return;
-
-            document.getElementById("myTokensSection").style.display = "block";
-            document.getElementById("loadingTokens").style.display = "inline-block";
-            const listDiv = document.getElementById("tokensList");
-
-            try {
-                const latestBlock = await provider.getBlockNumber();
-                const fromBlock = latestBlock - RPC_BLOCK_LIMIT; // Limita a busca aos últimos blocos
-
-                const filter = factoryContract.filters.TokenCreated();
-                const events = await factoryContract.queryFilter(filter, fromBlock);
-
-                const myTokens = events.filter(ev => ev.args[3].toLowerCase() === currentUserAddress.toLowerCase());
-
-                document.getElementById("loadingTokens").style.display = "none";
-                listDiv.innerHTML = ""; // Limpa antes de renderizar (se a injeção falhou antes)
-
-                if (myTokens.length === 0) {
-                    listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">Nenhum token encontrado nesta carteira.</p>';
-                    return;
-                }
-                
-                myTokens.reverse().forEach(ev => {
-                    injectTokenToDashboard(ev.args[0], ev.args[1], ev.args[2]);
-                });
-
-            } catch (error) {
-                console.error("Erro ao buscar tokens:", error);
-                document.getElementById("loadingTokens").style.display = "none";
-                listDiv.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem; text-align: center;">⚠️ Erro: Falha ao carregar histórico (RPC/Rede).</p>';
-                log("Erro ao carregar histórico.");
-            }
+             // Esta função foi desativada para evitar o erro RPC
+             document.getElementById("loadingTokens").style.display = "none";
+             const listDiv = document.getElementById("tokensList");
+             if (listDiv.children.length === 0) {
+                 listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
+             }
         }
 
         async function watchToken(address, symbol) {
