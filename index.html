@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - APENAS ADICIONEI ESTILO PARA O AVISO DE CONEXÃO] */
+        /* [ESTILOS OMITIDOS - SEM MUDANÇAS] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
             --electric-blue: #3b82f6; 
@@ -31,7 +31,7 @@
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: #a78bfa; }
         .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-connect { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-bottom: 10px; } /* Diminuído para dar espaço ao aviso */
+        .btn-connect { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-bottom: 10px; } 
         .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; }
         .btn-create { background: var(--accent-gradient); color: #000; }
         .btn-create:hover:not(:disabled) { opacity: 0.9; transform: scale(1.02); }
@@ -54,21 +54,20 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; }
+        
+        /* Link do Explorer */
         .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); }
         .explorer-link-full:hover { border-color: #60a5fa; color: white; }
-        .btn-faucet-header { position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: 0.3s; }
+
+        /* Botão Faucet na lateral superior */
+        .btn-faucet-header {
+            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: 0.3s;
+        }
         .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        /* NOVO ESTILO: Aviso de Escolha de Carteira */
+        /* Aviso de Escolha de Carteira */
         .wallet-info-note {
-            color: #d1d5db; /* Cinza claro */
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-left: 3px solid #60a5fa; /* Detalhe azul */
-            background: rgba(45, 55, 72, 0.2);
-            border-radius: 0 4px 4px 0;
-            line-height: 1.4;
+            color: #d1d5db; font-size: 0.8rem; margin-bottom: 20px; padding: 10px; border-left: 3px solid #60a5fa; background: rgba(45, 55, 72, 0.2); border-radius: 0 4px 4px 0; line-height: 1.4;
         }
 
         @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } .btn-faucet-header { position: relative; margin: 10px auto; right: auto; top: auto; } }
@@ -187,7 +186,7 @@
                     btn.onclick = disconnectWallet; 
                     btn.classList.add('btn-disconnect'); 
                     
-                    // Oculta o aviso de escolha de carteira após a conexão
+                    // Oculta o aviso de escolha de carteira
                     document.getElementById('walletNote').style.display = 'none';
 
                     document.getElementById("formFields").style.opacity = "1";
@@ -249,7 +248,6 @@
                      <span>${address.slice(0,6)}...${address.slice(-4)}</span>
                  </div>
                  <div style="display:flex; gap:5px;">
-                     <a href="https://testnet.arcscan.app/token/${address}" target="_blank" class="mini-btn" style="text-decoration:none;">🔍 Scan</a>
                      <button onclick="watchToken('${address}', '${symbol}')" class="mini-btn">🦊 Add</button>
                  </div>
              `;
