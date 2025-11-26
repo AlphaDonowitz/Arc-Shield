@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V33 - TERRA ARRASADA) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V34 - FORÇA BRUTA) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -214,16 +214,14 @@
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        /* --- LIMPEZA DE SESSÃO TOTAL (TERRA ARRASADA) --- */
         function disconnectWallet() { 
             const btn = document.getElementById("btnConnect");
             btn.innerHTML = "🔌 Conectar Carteira";
             btn.onclick = connectWallet;
             btn.classList.remove('btn-disconnect');
             
-            const form = document.getElementById("formFields");
-            form.style.opacity = "0.5";
-            form.style.pointerEvents = "none";
+            document.getElementById("formFields").style.opacity = "0.5";
+            document.getElementById("formFields").style.pointerEvents = "none";
             document.getElementById("btnCreate").disabled = true;
             document.getElementById("tokenName").value = "";
             document.getElementById("tokenSymbol").value = "";
@@ -234,19 +232,13 @@
             document.getElementById("myTokensSection").style.display = "none";
             document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
 
-            // Limpeza de variáveis e storage
             if (provider) provider = null;
             signer = null;
             currentUserAddress = null;
             factoryContract = null;
             
-            // Tenta limpar qualquer cache local
-            try {
-                localStorage.clear();
-                sessionStorage.clear();
-            } catch(e) { console.log("Erro ao limpar storage:", e); }
-
-            log("Carteira desconectada. Sessão limpa.");
+            try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
+            log("Carteira desconectada. Cache limpo.");
         }
 
         const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
@@ -260,28 +252,36 @@
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
-        /* --- CONEXÃO INTELIGENTE (MULTI-WALLET CHECK) --- */
+        /* --- CONEXÃO FORÇA BRUTA (V34) --- */
         async function connectWallet() {
             if (window.ethereum) {
                 try {
-                    // Detecção de conflito de Carteiras (MetaMask + Rabby + Outras)
-                    let ethereumProvider = window.ethereum;
-                    if (window.ethereum.providers) {
-                        // Se houver múltiplas, tenta pegar a MetaMask ou a primeira disponível
-                        ethereumProvider = window.ethereum.providers.find((p) => p.isMetaMask) || window.ethereum.providers[0];
-                    }
-
-                    // Tenta forçar a janela de permissões usando o provider correto
-                    await ethereumProvider.request({
+                    // Passo 1: PEDIR PERMISSÃO EXPLICITAMENTE (Ignora providers complexos, vai no global)
+                    // Isso deve abrir o popup da MetaMask/Rabby forçando a escolha
+                    console.log("Tentando wallet_requestPermissions...");
+                    await window.ethereum.request({
                         method: "wallet_requestPermissions",
                         params: [{ eth_accounts: {} }]
                     });
 
-                    // Instancia o Ethers com o provider que respondendo
-                    provider = new ethers.BrowserProvider(ethereumProvider);
-                    signer = await provider.getSigner();
-                    currentUserAddress = await signer.getAddress();
+                    // Passo 2: REQUISITAR CONTAS APÓS A PERMISSÃO
+                    console.log("Tentando eth_requestAccounts...");
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
+                    if (!accounts || accounts.length === 0) {
+                        alert("Nenhuma conta selecionada.");
+                        return;
+                    }
+                    
+                    // Passo 3: CONFIGURAR ETHERS COM A CONTA SELECIONADA
+                    // Usamos a conta[0] explicitamente retornada pelo passo anterior
+                    currentUserAddress = accounts[0];
+                    console.log("Conta selecionada:", currentUserAddress);
+
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    
+                    // Validação de Rede
                     const code = await provider.getCode(contractAddress);
                     if (code === '0x') {
                         alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
@@ -289,6 +289,7 @@
                         return;
                     }
                     
+                    // UI Update
                     const btn = document.getElementById("btnConnect");
                     btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
                     btn.onclick = disconnectWallet; 
@@ -303,17 +304,18 @@
                     document.getElementById("btnCreate").disabled = false;
                     
                     factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
-                    log("Carteira conectada: " + currentUserAddress);
+                    log("Conectado: " + currentUserAddress);
 
                 } catch (error) { 
-                    console.error("DEBUG - Erro Conexão:", error);
+                    console.error("DEBUG Erro:", error);
+                    // Erro 4001 = Usuário rejeitou o popup
                     if (error.code === 4001) {
-                        log("Seleção de carteira cancelada.");
+                        log("Seleção cancelada pelo usuário.");
                     } else {
-                        log("Erro ao conectar. Veja o console (F12).");
+                        log("Erro na conexão. Verifique o console.");
                     }
                 }
-            } else { alert("Nenhuma carteira detectada!"); }
+            } else { alert("Instale a MetaMask!"); }
         }
 
         async function createToken() {
