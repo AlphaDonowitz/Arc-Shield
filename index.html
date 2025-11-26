@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V35 - FINAL) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V36 - RELOAD NUCLEAR) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -209,28 +209,25 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
-        // Variáveis Globais
         let provider, signer, factoryContract;
         let currentUserAddress;
         
-        // Contrato Info
         const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
         const contractABI = [
             { "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "initialSupply", "type": "uint256" } ], "name": "createToken", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
             { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "type": "event" }
         ];
 
-        /* --- INICIALIZAÇÃO E EVENT LISTENERS --- */
-        window.onload = function() {
+        /* --- VERIFICAÇÃO AUTOMÁTICA AO RECARREGAR --- */
+        window.onload = async function() {
+            // Se o usuário já estiver conectado (pós-reload ou persistência), ajustamos a UI
             if (window.ethereum) {
-                // Se o usuário trocar a conta na carteira, atualizamos a UI
-                window.ethereum.on('accountsChanged', function (accounts) {
-                    if (accounts.length > 0) {
-                        handleLoginSuccess(accounts[0]);
-                    } else {
-                        disconnectWallet();
-                    }
-                });
+                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                 if (accounts && accounts.length > 0) {
+                     // Usuário já conectado, apenas exibe o app
+                     startApp();
+                     setupConnection(accounts[0]);
+                 }
             }
         };
 
@@ -241,46 +238,39 @@
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
-        /* --- CONEXÃO RPC PURA (BYPASS ETHERS) --- */
+        /* --- CONEXÃO COM PEDIDO DE PERMISSÃO --- */
         async function connectWallet() {
             if (!window.ethereum) { alert("Instale a MetaMask!"); return; }
 
             try {
-                // 1. SOLICITAÇÃO FORÇADA DE PERMISSÕES
-                // Isso DEVE abrir o popup. Se não abrir, a carteira está bloqueando.
+                // Força o popup de escolha
                 await window.ethereum.request({
                     method: "wallet_requestPermissions",
                     params: [{ eth_accounts: {} }]
                 });
                 
-                // 2. RECUPERAÇÃO DA CONTA SELECIONADA
+                // Pega a conta escolhida
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
                 if (accounts && accounts.length > 0) {
-                    handleLoginSuccess(accounts[0]);
+                    setupConnection(accounts[0]);
                 }
 
             } catch (error) {
                 console.error("Erro Conexão:", error);
-                if (error.code === 4001) {
-                    log("Seleção cancelada.");
-                } else {
-                    log("Erro: " + error.message);
-                }
+                if (error.code === 4001) log("Seleção cancelada.");
             }
         }
 
-        /* --- LÓGICA DE SUCESSO DE LOGIN --- */
-        async function handleLoginSuccess(address) {
+        async function setupConnection(address) {
             currentUserAddress = address;
             log("Conectado: " + currentUserAddress);
 
-            // Agora sim instanciamos o Ethers APENAS para o contrato
             provider = new ethers.BrowserProvider(window.ethereum);
             signer = await provider.getSigner();
             factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-            // Atualiza UI
+            // UI
             const btn = document.getElementById("btnConnect");
             btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
             btn.onclick = disconnectWallet; 
@@ -295,33 +285,24 @@
             document.getElementById("btnCreate").disabled = false;
         }
 
-        /* --- DESCONEXÃO (RESET VISUAL) --- */
-        function disconnectWallet() { 
-            const btn = document.getElementById("btnConnect");
-            btn.innerHTML = "🔌 Conectar Carteira";
-            btn.onclick = connectWallet;
-            btn.classList.remove('btn-disconnect');
-            
-            document.getElementById("formFields").style.opacity = "0.5";
-            document.getElementById("formFields").style.pointerEvents = "none";
-            document.getElementById("btnCreate").disabled = true;
-            document.getElementById("tokenName").value = "";
-            document.getElementById("tokenSymbol").value = "";
-            document.getElementById("tokenSupply").value = "";
+        /* --- DESCONEXÃO NUCLEAR (REVOKE + RELOAD) --- */
+        async function disconnectWallet() { 
+            // 1. Tenta revogar a permissão no nível da carteira
+            try {
+                await window.ethereum.request({
+                    method: "wallet_revokePermissions",
+                    params: [{ eth_accounts: {} }]
+                });
+            } catch (e) {
+                console.log("Revoke não suportado pela carteira, seguindo para limpeza.");
+            }
 
-            document.getElementById("explorerLink").style.display = "none";
-            document.getElementById("resultArea").style.display = "none";
-            document.getElementById("myTokensSection").style.display = "none";
-            document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
+            // 2. Limpa todos os caches locais do navegador
+            localStorage.clear();
+            sessionStorage.clear();
 
-            // Limpeza
-            provider = null;
-            signer = null;
-            currentUserAddress = null;
-            factoryContract = null;
-            try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
-
-            log("Desconectado.");
+            // 3. RELOAD DA PÁGINA (O Segredo para limpar a memória RAM da extensão)
+            window.location.reload();
         }
 
         async function createToken() {
