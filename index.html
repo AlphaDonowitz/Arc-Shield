@@ -6,10 +6,12 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - SEM MUDANÇAS ESTRUTURAIS] */
+        /* [ESTILOS OMITIDOS - ADIÇÃO DE NOVA VARIÁVEL E CLASSE DE GRADIENTE] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
             --electric-blue: #3b82f6; 
+            /* NOVO: Gradiente para a palavra "Shield" */
+            --shield-gradient: linear-gradient(to right, #20c997, #17a2b8); /* Verde-água para Ciano */
         }
         body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         a { text-decoration: none; transition: 0.3s; }
@@ -20,6 +22,9 @@
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
         h1 { font-size: 3.5rem; line-height: 1; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -2px; text-align: center; }
         .gradient-text { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* NOVO: Estilo para o gradiente de "Shield" */
+        .shield-gradient { background: var(--shield-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
         .btn-white { background: #ffffff; color: #000000; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: transform 0.2s, box-shadow 0.2s; }
@@ -111,7 +116,7 @@
         </a>
 
         <div id="startScreen">
-            <h1><span class="gradient-text">Arc Shield</span></h1>
+            <h1><span class="gradient-text">Arc</span> <span class="shield-gradient">Shield</span></h1>
             <p class="hero-desc">Crie tokens com velocidade e segurança na Arc Testnet da Circle</p>
             <button class="btn-white" onclick="startApp()">⚡ Começar Agora</button>
         </div>
@@ -256,7 +261,7 @@
                 }
                 
                 btn.innerText = "🚀 Criar Outro"; btn.disabled = false;
-                document.getElementById("resultArea").style.display = "flex"; // Alterado para 'flex'
+                document.getElementById("resultArea").style.display = "flex"; 
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
                 log("Sucesso!");
                 
