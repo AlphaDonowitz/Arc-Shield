@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V32 - BARE METAL FIX) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V33 - TERRA ARRASADA) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -42,7 +42,6 @@
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
 
-        /* --- BOTÃO HERO --- */
         .btn-hero { 
             background: var(--accent-color); 
             color: white; 
@@ -73,10 +72,9 @@
         .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         
-        /* --- INPUTS --- */
+        /* INPUTS BLINDADOS */
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: var(--accent-color); }
-        
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -211,13 +209,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
-        /* --- NAVEGAÇÃO --- */
         function startApp() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        /* --- DESCONEXÃO E LIMPEZA DE ESTADO --- */
+        /* --- LIMPEZA DE SESSÃO TOTAL (TERRA ARRASADA) --- */
         function disconnectWallet() { 
             const btn = document.getElementById("btnConnect");
             btn.innerHTML = "🔌 Conectar Carteira";
@@ -235,19 +232,23 @@
             document.getElementById("explorerLink").style.display = "none";
             document.getElementById("resultArea").style.display = "none";
             document.getElementById("myTokensSection").style.display = "none";
-            
             document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
 
-            // Zera as variáveis globais
-            if (provider) provider = null; // IMPORTANTE
+            // Limpeza de variáveis e storage
+            if (provider) provider = null;
             signer = null;
             currentUserAddress = null;
             factoryContract = null;
+            
+            // Tenta limpar qualquer cache local
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+            } catch(e) { console.log("Erro ao limpar storage:", e); }
 
             log("Carteira desconectada. Sessão limpa.");
         }
 
-        /* --- LOGICA BLOCKCHAIN --- */
         const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
         const contractABI = [
             { "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "initialSupply", "type": "uint256" } ], "name": "createToken", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
@@ -259,23 +260,28 @@
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
+        /* --- CONEXÃO INTELIGENTE (MULTI-WALLET CHECK) --- */
         async function connectWallet() {
             if (window.ethereum) {
                 try {
-                    // --- MUDANÇA V32: CHAMADA DIRETA AO WINDOW.ETHEREUM ---
-                    // Isso evita que o Ethers.js tente gerenciar o estado da conexão.
-                    // Pedimos explicitamente para a carteira pedir permissões de contas.
-                    await window.ethereum.request({
+                    // Detecção de conflito de Carteiras (MetaMask + Rabby + Outras)
+                    let ethereumProvider = window.ethereum;
+                    if (window.ethereum.providers) {
+                        // Se houver múltiplas, tenta pegar a MetaMask ou a primeira disponível
+                        ethereumProvider = window.ethereum.providers.find((p) => p.isMetaMask) || window.ethereum.providers[0];
+                    }
+
+                    // Tenta forçar a janela de permissões usando o provider correto
+                    await ethereumProvider.request({
                         method: "wallet_requestPermissions",
                         params: [{ eth_accounts: {} }]
                     });
 
-                    // Depois que a permissão é dada, instanciamos o provider
-                    provider = new ethers.BrowserProvider(window.ethereum);
+                    // Instancia o Ethers com o provider que respondendo
+                    provider = new ethers.BrowserProvider(ethereumProvider);
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
-                    // Verificação de Rede
                     const code = await provider.getCode(contractAddress);
                     if (code === '0x') {
                         alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
@@ -283,7 +289,6 @@
                         return;
                     }
                     
-                    // Atualiza UI
                     const btn = document.getElementById("btnConnect");
                     btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
                     btn.onclick = disconnectWallet; 
@@ -301,14 +306,14 @@
                     log("Carteira conectada: " + currentUserAddress);
 
                 } catch (error) { 
-                    console.error("Erro Conexão:", error);
+                    console.error("DEBUG - Erro Conexão:", error);
                     if (error.code === 4001) {
-                        log("Conexão cancelada pelo usuário.");
+                        log("Seleção de carteira cancelada.");
                     } else {
-                        log("Erro ao conectar (Verifique Console).");
+                        log("Erro ao conectar. Veja o console (F12).");
                     }
                 }
-            } else { alert("Instale a MetaMask!"); }
+            } else { alert("Nenhuma carteira detectada!"); }
         }
 
         async function createToken() {
