@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V27 - FINAL) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V28 - PREMIUM) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -27,10 +27,12 @@
         }
         a { text-decoration: none; transition: 0.3s; }
         .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; transition: opacity 0.5s ease; position: relative; box-sizing: border-box; }
+        
         .badge { background: var(--card-bg); border: 1px solid var(--border-light); padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 24px; backdrop-filter: blur(5px); color: white; cursor: pointer; }
         .badge:hover { border-color: var(--accent-color); }
         .dot { width: 8px; height: 8px; background-color: var(--accent-color); border-radius: 50%; box-shadow: 0 0 8px var(--accent-color); animation: blink 2s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
+        
         h1 { font-size: 3.5rem; line-height: 1; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -2px; text-align: center; }
         
         /* Branding */
@@ -39,14 +41,48 @@
 
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
-        .btn-white { background: #ffffff; color: #000000; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: transform 0.2s, box-shadow 0.2s; }
-        .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2); }
+
+        /* --- NOVO BOTÃO HERO (PREMIUM) --- */
+        .btn-hero { 
+            background: var(--accent-color); /* Azul da Marca */
+            color: white; 
+            padding: 18px 40px; 
+            border-radius: 12px; /* Formato moderno (quadrado arredondado) */
+            font-weight: 700; 
+            font-size: 1.1rem; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 0 20px rgba(39, 117, 202, 0.15); /* Glow suave */
+        }
+        
+        .btn-hero:hover { 
+            transform: translateY(-3px); 
+            background: #206bc4; /* Azul levemente mais vibrante */
+            box-shadow: 0 10px 30px rgba(39, 117, 202, 0.4); /* Glow intenso */
+            letter-spacing: 0.5px; 
+        }
+
+        /* Animação da seta */
+        .btn-hero span.arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .btn-hero:hover span.arrow {
+            transform: translateX(5px); /* Move a seta */
+        }
+
         #appContainer { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; padding-bottom: 80px; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
         .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: var(--accent-color); }
+        
         .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } 
         .btn-connect { background: transparent; border: 1px solid var(--border-light); color: white; margin-bottom: 10px; } 
         .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } 
@@ -74,6 +110,7 @@
         .token-info span { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
         .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: var(--accent-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
         .mini-btn:hover { background: var(--accent-color); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(39, 117, 202, 0.4); } 
+        
         .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 25px; background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
         .creator-link { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .creator-link:hover { color: #fff; }
@@ -111,7 +148,10 @@
         <div id="startScreen">
             <h1><span class="gradient-text">Arc</span> <span class="shield-gradient">Shield</span></h1>
             <p class="hero-desc">Crie tokens com velocidade e segurança na Arc Testnet da Circle</p>
-            <button class="btn-white" onclick="startApp()">⚡ Começar Agora</button>
+            
+            <button class="btn-hero" onclick="startApp()">
+                Começar Agora <span class="arrow">→</span>
+            </button>
         </div>
 
         <div id="appContainer">
@@ -179,14 +219,13 @@
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        /* --- MUDANÇA V27: LIMPEZA COMPLETA DE SESSÃO --- */
+        /* --- DESCONEXÃO SUAVE (SEM RELOAD + LIMPEZA DE SESSÃO) --- */
         function disconnectWallet() { 
             const btn = document.getElementById("btnConnect");
             btn.innerHTML = "🔌 Conectar Carteira";
             btn.onclick = connectWallet;
             btn.classList.remove('btn-disconnect');
             
-            // Reseta formulário
             const form = document.getElementById("formFields");
             form.style.opacity = "0.5";
             form.style.pointerEvents = "none";
@@ -195,12 +234,11 @@
             document.getElementById("tokenSymbol").value = "";
             document.getElementById("tokenSupply").value = "";
 
-            // Oculta links e resultados
             document.getElementById("explorerLink").style.display = "none";
             document.getElementById("resultArea").style.display = "none";
             document.getElementById("myTokensSection").style.display = "none";
             
-            // CRÍTICO: Limpa a lista de tokens visualmente para o próximo usuário
+            // Limpa lista para privacidade
             document.getElementById("tokensList").innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
 
             signer = null;
@@ -234,7 +272,6 @@
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
-                    // VERIFICAÇÃO SIMPLES DE REDE
                     const code = await provider.getCode(contractAddress);
                     if (code === '0x') {
                         alert("⚠️ AVISO: Contrato não encontrado. Verifique se você está na ARC TESTNET.");
@@ -322,6 +359,14 @@
                  placeholder.remove();
              }
              document.getElementById("myTokensSection").style.display = "block";
+        }
+
+        async function fetchUserTokens() {
+             document.getElementById("loadingTokens").style.display = "none";
+             const listDiv = document.getElementById("tokensList");
+             if (listDiv.children.length === 0) {
+                 listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">O histórico é carregado apenas durante a sessão atual.</p>';
+             }
         }
 
         async function watchToken(address, symbol) {
