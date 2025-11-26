@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V22) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V23) --- */
         :root {
             --bg-deep: #0A0A0A; /* Preto Profundo */
             --text-main: #ffffff; /* Branco */
@@ -15,13 +15,12 @@
             /* ÚNICA COR FORTE: USDC Blue */
             --accent-color: #2775CA; 
             
-            --card-bg: rgba(255, 255, 255, 0.05); /* Card discreto */
-            --border-light: rgba(255, 255, 255, 0.15); /* Bordas suaves */
+            --card-bg: rgba(255, 255, 255, 0.05); 
+            --border-light: rgba(255, 255, 255, 0.15); 
             --danger: #e74c3c;
         }
         body { 
             background-color: var(--bg-deep); 
-            /* Remove o radial gradient roxo */
             background-image: none;
             color: var(--text-main); 
             font-family: 'Inter', sans-serif; 
@@ -37,11 +36,9 @@
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
         h1 { font-size: 3.5rem; line-height: 1; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -2px; text-align: center; }
         
-        /* NOVO: ARC - Branco Puro */
-        .gradient-text { color: var(--text-main); } 
-
-        /* NOVO: SHIELD - USDC Blue */
-        .shield-gradient { color: var(--accent-color); }
+        /* CLASSES DE MARCA (Branding) */
+        .gradient-text { color: var(--text-main); } /* Arc (Branco) */
+        .shield-gradient { color: var(--accent-color); } /* Shield (Azul USDC) */
 
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
@@ -57,7 +54,7 @@
         .btn-connect { background: transparent; border: 1px solid var(--border-light); color: white; margin-bottom: 10px; } 
         .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } 
         
-        /* NOVO: Botão Principal - USDC Blue */
+        /* Botão Principal - USDC Blue */
         .btn-create { background: var(--accent-color); color: white; }
         .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.6); } 
         .btn-create:disabled { background: #333; color: #666; cursor: not-allowed; }
@@ -65,7 +62,7 @@
         /* Container de sucesso inline */
         .success-box { 
             margin-top: 20px; padding: 15px; 
-            background: rgba(39, 117, 202, 0.1); /* Fundo sutilmente azul */
+            background: rgba(39, 117, 202, 0.1); 
             border: 1px solid var(--accent-color); 
             border-radius: 12px; display: none; 
             align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
@@ -95,7 +92,7 @@
         .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: var(--accent-color); font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } 
         .explorer-link-full:hover { border-color: var(--accent-color); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); } 
 
-        /* Botão Faucet na lateral superior */
+        /* Botão Faucet */
         .btn-faucet-header {
             position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-color); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); transition: all 0.2s ease-in-out; } 
         .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(39, 117, 202, 0.5); } 
@@ -133,7 +130,10 @@
         <div id="appContainer">
             <div class="card">
                 <div style="text-align: center; margin-bottom: 25px;">
-                    <h2 style="margin: 0;">Arc Shield</h2> <p style="color: #64748b; font-size: 0.9rem;">Configure seu ativo digital</p>
+                    <h2 style="margin: 0;">
+                        <span class="gradient-text">Arc</span> <span class="shield-gradient">Shield</span>
+                    </h2> 
+                    <p style="color: #64748b; font-size: 0.9rem;">Configure seu ativo digital</p>
                 </div>
 
                 <button id="btnConnect" class="btn-action btn-connect" onclick="connectWallet()">🔌 Conectar Carteira</button>
@@ -288,7 +288,7 @@
              card.className = "token-card";
              card.innerHTML = `
                  <div class="token-info">
-                     <h3>${name} <span style="color:#a78bfa">($${symbol})</span></h3>
+                     <h3>${name} <span style="color:#2775CA">($${symbol})</span></h3>
                      <span>${address.slice(0,6)}...${address.slice(-4)}</span>
                  </div>
                  <div style="display:flex; gap:5px;">
