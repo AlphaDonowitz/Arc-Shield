@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - ADIÇÕES E PEQUENAS ALTERAÇÕES NAS ANIMAÇÕES E RESULTADO] */
+        /* [ESTILOS OMITIDOS - SEM MUDANÇAS ESTRUTURAIS] */
         :root {
             --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
             --electric-blue: #3b82f6; 
@@ -30,14 +30,14 @@
         label { color: #a78bfa; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         input { width: 100%; padding: 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         input:focus { border-color: #a78bfa; }
-        .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } /* Alterado para ALL */
+        .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } 
         .btn-connect { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-bottom: 10px; } 
-        .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } /* Adicionado animação */
+        .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } 
         .btn-create { background: var(--accent-gradient); color: #000; }
-        .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.4); } /* Adicionado animação */
+        .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.4); } 
         .btn-create:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-        /* NOVO ESTILO: Container de sucesso inline */
+        /* Container de sucesso inline */
         .success-box { 
             margin-top: 20px; 
             padding: 15px; 
@@ -46,45 +46,45 @@
             border-radius: 12px; 
             text-align: center; 
             display: none; 
-            align-items: center; /* Alinha verticalmente */
-            justify-content: center; /* Centraliza horizontalmente */
-            gap: 10px; /* Espaçamento entre os itens */
-            flex-wrap: wrap; /* Quebra linha em telas pequenas */
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
         }
         .success-box p { margin: 0; font-weight: bold; }
         .success-box a { 
             color: #a78bfa; 
             font-weight: bold; 
             text-decoration: underline; 
-            transition: color 0.2s ease-in-out; /* Animação de cor */
+            transition: color 0.2s ease-in-out; 
         }
-        .success-box a:hover { color: #8b5cf6; } /* Cor de hover */
+        .success-box a:hover { color: #8b5cf6; } 
 
         .tokens-section { width: 100%; margin-top: 20px; }
         .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: white; display: flex; align-items: center; gap: 10px; }
         .token-list { display: grid; gap: 15px; }
-        .token-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease-in-out; } /* Alterado para ALL */
-        .token-card:hover { border-color: #a78bfa; background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.2); } /* Adicionado animação */
+        .token-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease-in-out; } 
+        .token-card:hover { border-color: #a78bfa; background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.2); } 
         .token-info h3 { margin: 0; font-size: 1rem; color: white; }
         .token-info span { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
-        .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #a78bfa; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } /* Alterado para ALL */
-        .mini-btn:hover { background: #a78bfa; color: black; transform: scale(1.05); box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4); } /* Adicionado animação */
+        .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #a78bfa; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
+        .mini-btn:hover { background: #a78bfa; color: black; transform: scale(1.05); box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4); } 
         .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 25px; background: rgba(2, 4, 16, 0.9); backdrop-filter: blur(10px); font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
         .creator-link { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .creator-link:hover { color: #fff; }
         .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: #a78bfa; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
-        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231,76,60,0.4); } /* Adicionado animação */
+        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231,76,60,0.4); } 
         
         /* Link do Explorer */
-        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } /* Alterado para ALL */
-        .explorer-link-full:hover { border-color: #60a5fa; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(96,165,250,0.3); } /* Adicionado animação */
+        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } 
+        .explorer-link-full:hover { border-color: #60a5fa; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(96,165,250,0.3); } 
 
         /* Botão Faucet na lateral superior */
         .btn-faucet-header {
-            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: all 0.2s ease-in-out; } /* Alterado para ALL */
-        .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(167, 139, 250, 0.5); } /* Adicionado animação */
+            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: all 0.2s ease-in-out; } 
+        .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(167, 139, 250, 0.5); } 
 
         /* Aviso de Escolha de Carteira */
         .wallet-info-note {
@@ -95,7 +95,7 @@
             h1 { font-size: 2.5rem; } 
             .footer-bar { flex-direction: column; gap: 10px; text-align: center; } 
             .btn-faucet-header { position: relative; margin: 10px auto; right: auto; top: auto; } 
-            .success-box { flex-direction: column; } /* Garante que o sucesso se mantenha limpo em mobile */
+            .success-box { flex-direction: column; } 
         }
     </style>
 </head>
@@ -119,8 +119,7 @@
         <div id="appContainer">
             <div class="card">
                 <div style="text-align: center; margin-bottom: 25px;">
-                    <h2 style="margin: 0;">Arc Factory</h2>
-                    <p style="color: #64748b; font-size: 0.9rem;">Configure seu ativo digital</p>
+                    <h2 style="margin: 0;">Arc Shield</h2> <p style="color: #64748b; font-size: 0.9rem;">Configure seu ativo digital</p>
                 </div>
 
                 <button id="btnConnect" class="btn-action btn-connect" onclick="connectWallet()">🔌 Conectar Carteira</button>
