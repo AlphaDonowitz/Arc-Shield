@@ -6,24 +6,42 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [ESTILOS OMITIDOS - ADIÇÃO DE NOVA VARIÁVEL E CLASSE DE GRADIENTE] */
+        /* --- ESTILOS INSTITUCIONAIS (V22) --- */
         :root {
-            --bg-deep: #020410; --text-main: #ffffff; --text-muted: #94a3b8; --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa); --card-bg: rgba(255, 255, 255, 0.03); --border-light: rgba(255, 255, 255, 0.1); --danger: #e74c3c;
-            --electric-blue: #3b82f6; 
-            /* NOVO: Gradiente para a palavra "Shield" */
-            --shield-gradient: linear-gradient(to right, #20c997, #17a2b8); /* Verde-água para Ciano */
+            --bg-deep: #0A0A0A; /* Preto Profundo */
+            --text-main: #ffffff; /* Branco */
+            --text-muted: #94a3b8; /* Off-White/Cinza */
+            
+            /* ÚNICA COR FORTE: USDC Blue */
+            --accent-color: #2775CA; 
+            
+            --card-bg: rgba(255, 255, 255, 0.05); /* Card discreto */
+            --border-light: rgba(255, 255, 255, 0.15); /* Bordas suaves */
+            --danger: #e74c3c;
         }
-        body { background-color: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020410 60%); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        body { 
+            background-color: var(--bg-deep); 
+            /* Remove o radial gradient roxo */
+            background-image: none;
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+        }
         a { text-decoration: none; transition: 0.3s; }
         .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; transition: opacity 0.5s ease; position: relative; box-sizing: border-box; }
-        .badge { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 24px; backdrop-filter: blur(5px); color: white; cursor: pointer; }
-        .badge:hover { border-color: #10b981; }
-        .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: blink 2s infinite; }
+        .badge { background: var(--card-bg); border: 1px solid var(--border-light); padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 24px; backdrop-filter: blur(5px); color: white; cursor: pointer; }
+        .badge:hover { border-color: var(--accent-color); }
+        .dot { width: 8px; height: 8px; background-color: var(--accent-color); border-radius: 50%; box-shadow: 0 0 8px var(--accent-color); animation: blink 2s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
         h1 { font-size: 3.5rem; line-height: 1; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -2px; text-align: center; }
-        .gradient-text { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        /* NOVO: Estilo para o gradiente de "Shield" */
-        .shield-gradient { background: var(--shield-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* NOVO: ARC - Branco Puro */
+        .gradient-text { color: var(--text-main); } 
+
+        /* NOVO: SHIELD - USDC Blue */
+        .shield-gradient { color: var(--accent-color); }
 
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
         #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
@@ -31,69 +49,60 @@
         .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2); }
         #appContainer { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; padding-bottom: 80px; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
-        label { color: #a78bfa; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
-        input { width: 100%; padding: 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
-        input:focus { border-color: #a78bfa; }
+        .card { background: var(--card-bg); border: 1px solid var(--border-light); padding: 2.5rem; border-radius: 24px; width: 100%; backdrop-filter: blur(20px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); margin-bottom: 30px; box-sizing: border-box; }
+        label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; margin-bottom: 20px; outline: none; box-sizing: border-box; }
+        input:focus { border-color: var(--accent-color); }
         .btn-action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; } 
-        .btn-connect { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-bottom: 10px; } 
+        .btn-connect { background: transparent; border: 1px solid var(--border-light); color: white; margin-bottom: 10px; } 
         .btn-connect:hover { background: rgba(255,255,255,0.05); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); } 
-        .btn-create { background: var(--accent-gradient); color: #000; }
-        .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.4); } 
+        
+        /* NOVO: Botão Principal - USDC Blue */
+        .btn-create { background: var(--accent-color); color: white; }
+        .btn-create:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.6); } 
         .btn-create:disabled { background: #333; color: #666; cursor: not-allowed; }
 
         /* Container de sucesso inline */
         .success-box { 
-            margin-top: 20px; 
-            padding: 15px; 
-            background: rgba(167, 139, 250, 0.1); 
-            border: 1px solid #a78bfa; 
-            border-radius: 12px; 
-            text-align: center; 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            flex-wrap: wrap; 
+            margin-top: 20px; padding: 15px; 
+            background: rgba(39, 117, 202, 0.1); /* Fundo sutilmente azul */
+            border: 1px solid var(--accent-color); 
+            border-radius: 12px; display: none; 
+            align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
         }
         .success-box p { margin: 0; font-weight: bold; }
         .success-box a { 
-            color: #a78bfa; 
-            font-weight: bold; 
-            text-decoration: underline; 
-            transition: color 0.2s ease-in-out; 
+            color: var(--accent-color); 
+            font-weight: bold; text-decoration: underline; transition: color 0.2s ease-in-out; 
         }
-        .success-box a:hover { color: #8b5cf6; } 
+        .success-box a:hover { color: #5cb8ff; } 
 
         .tokens-section { width: 100%; margin-top: 20px; }
         .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: white; display: flex; align-items: center; gap: 10px; }
         .token-list { display: grid; gap: 15px; }
-        .token-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease-in-out; } 
-        .token-card:hover { border-color: #a78bfa; background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.2); } 
+        .token-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease-in-out; } 
+        .token-card:hover { border-color: var(--accent-color); background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.2); } 
         .token-info h3 { margin: 0; font-size: 1rem; color: white; }
         .token-info span { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
-        .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #a78bfa; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
-        .mini-btn:hover { background: #a78bfa; color: black; transform: scale(1.05); box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4); } 
-        .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 25px; background: rgba(2, 4, 16, 0.9); backdrop-filter: blur(10px); font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
+        .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: var(--accent-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
+        .mini-btn:hover { background: var(--accent-color); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(39, 117, 202, 0.4); } 
+        .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 25px; background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
         .creator-link { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .creator-link:hover { color: #fff; }
-        .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: #a78bfa; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
-        .btn-disconnect:hover { background: #c0392b !important; border-color: var(--danger) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231,76,60,0.4); } 
+        .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         
         /* Link do Explorer */
-        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: #60a5fa; font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } 
-        .explorer-link-full:hover { border-color: #60a5fa; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(96,165,250,0.3); } 
+        .explorer-link-full { display: block; width: 100%; text-align: center; padding: 12px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-light); color: var(--accent-color); font-weight: 600; background: rgba(0,0,0,0.2); transition: all 0.2s ease-in-out; } 
+        .explorer-link-full:hover { border-color: var(--accent-color); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); } 
 
         /* Botão Faucet na lateral superior */
         .btn-faucet-header {
-            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-gradient); box-shadow: 0 5px 15px rgba(167, 139, 250, 0.3); transition: all 0.2s ease-in-out; } 
-        .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(167, 139, 250, 0.5); } 
+            position: absolute; top: 25px; right: 25px; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; z-index: 10; background: var(--accent-color); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.3); transition: all 0.2s ease-in-out; } 
+        .btn-faucet-header:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(39, 117, 202, 0.5); } 
 
         /* Aviso de Escolha de Carteira */
         .wallet-info-note {
-            color: #d1d5db; font-size: 0.8rem; margin-bottom: 20px; padding: 10px; border-left: 3px solid #60a5fa; background: rgba(45, 55, 72, 0.2); border-radius: 0 4px 4px 0; line-height: 1.4;
+            color: var(--text-muted); font-size: 0.8rem; margin-bottom: 20px; padding: 10px; border-left: 3px solid var(--accent-color); background: rgba(45, 55, 72, 0.2); border-radius: 0 4px 4px 0; line-height: 1.4;
         }
 
         @media (max-width: 600px) { 
