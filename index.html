@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS GERAIS (INALTERADOS) --- */
+        /* [Estilos e CSS INALTERADOS - OMITIDOS POR BREVIDADE] */
         :root {
             --bg-deep: #020410;
             --text-main: #ffffff;
@@ -14,7 +14,7 @@
             --accent-gradient: linear-gradient(to right, #a78bfa, #60a5fa);
             --card-bg: rgba(255, 255, 255, 0.03);
             --border-light: rgba(255, 255, 255, 0.1);
-            --danger: #e74c3c; /* Vermelho para desconectar */
+            --danger: #e74c3c;
         }
         body {
             background-color: var(--bg-deep);
@@ -65,7 +65,6 @@
         .creator-link:hover { color: #fff; }
         .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: #a78bfa; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* NOVO ESTILO PARA BOTAO DE DESCONEXÃO */
         .btn-disconnect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         .btn-disconnect:hover { background: #c0392b !important; border-color: #c0392b !important; }
         @media (max-width: 600px) { h1 { font-size: 2.5rem; } .footer-bar { flex-direction: column; gap: 10px; text-align: center; } }
@@ -143,10 +142,8 @@
             document.getElementById('appContainer').style.display = 'flex';
         }
 
-        // --- NOVO: FUNÇÃO DE DESCONEXÃO ---
+        // --- FUNÇÃO DE DESCONEXÃO (JÁ CORRIGIDA) ---
         function disconnectWallet() {
-            // A maneira mais limpa de desconectar em um dApp de página única é recarregar a página
-            // Isso força o provedor Ethers.js a re-iniciar, limpando o estado da sessão.
             window.location.reload(); 
         }
 
@@ -159,6 +156,7 @@
         
         let provider, signer, factoryContract;
         let currentUserAddress;
+        let RPC_BLOCK_LIMIT = 250000; // Limite para otimizar o queryFilter
 
         function log(msg) { document.getElementById("console").innerText = msg; }
 
@@ -170,10 +168,10 @@
                     signer = await provider.getSigner();
                     currentUserAddress = await signer.getAddress();
                     
-                    // --- MUDANÇA AQUI: Transforma o botão em Desconexão ---
+                    // --- MUDANÇA: Transforma o botão em Desconexão ---
                     const btn = document.getElementById("btnConnect");
                     btn.innerHTML = `Desconectar (${currentUserAddress.slice(0,6)}...)`;
-                    btn.onclick = disconnectWallet; // NOVO: Muda o handler para desconectar
+                    btn.onclick = disconnectWallet; // NOVO: Muda o handler
                     btn.classList.add('btn-disconnect'); // Adiciona estilo vermelho
                     
                     document.getElementById("formFields").style.opacity = "1";
@@ -181,7 +179,7 @@
                     document.getElementById("btnCreate").disabled = false;
                     
                     factoryContract = new ethers.Contract(contractAddress, contractABI, signer);
-                    log("Carteira conectada.");
+                    log("Carteira conectada. Carregando histórico...");
 
                     fetchUserTokens();
 
@@ -203,14 +201,24 @@
                 const tx = await factoryContract.createToken(name, symbol, supply);
                 log("Transação enviada... aguardando confirmação.");
                 
-                await tx.wait(); 
+                const receipt = await tx.wait(); // Espera a mineração
+                
+                // --- NOVO: INJEÇÃO IMEDIATA (para feedback) ---
+                if (receipt.logs) {
+                    const event = receipt.logs.find(l => { try { return factoryContract.interface.parseLog(l).name === 'TokenCreated'; } catch(e){return false} });
+                    if(event) {
+                       const parsed = factoryContract.interface.parseLog(event);
+                       injectTokenToDashboard(parsed.args.tokenAddress, parsed.args.name, parsed.args.symbol);
+                    }
+                }
                 
                 btn.innerText = "🚀 Criar Outro"; btn.disabled = false;
                 document.getElementById("resultArea").style.display = "block";
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
                 log("Sucesso!");
                 
-                setTimeout(fetchUserTokens, 2000); 
+                // Carrega histórico completo em background
+                fetchUserTokens(); 
 
             } catch (error) { 
                 console.error(error); 
@@ -219,6 +227,29 @@
             }
         }
 
+        // --- FUNÇÃO DE INJEÇÃO (PARA FEEDBACK IMEDIATO) ---
+        function injectTokenToDashboard(address, name, symbol) {
+             const listDiv = document.getElementById("tokensList");
+             const card = document.createElement("div");
+             card.className = "token-card";
+             card.innerHTML = `
+                 <div class="token-info">
+                     <h3>${name} <span style="color:#a78bfa">($${symbol})</span></h3>
+                     <span>${address.slice(0,6)}...${address.slice(-4)}</span>
+                 </div>
+                 <div style="display:flex; gap:5px;">
+                     <a href="https://testnet.arcscan.app/token/${address}" target="_blank" class="mini-btn" style="text-decoration:none;">🔍 Scan</a>
+                     <button onclick="watchToken('${address}', '${symbol}')" class="mini-btn">🦊 Add</button>
+                 </div>
+             `;
+             listDiv.prepend(card); // Adiciona no topo
+             const placeholder = listDiv.querySelector('p');
+             if (placeholder) placeholder.remove(); // Remove o placeholder "Nenhum token encontrado"
+             document.getElementById("myTokensSection").style.display = "block";
+        }
+
+
+        // --- FUNÇÃO PARA BUSCAR HISTÓRICO (AGORA OTIMIZADA) ---
         async function fetchUserTokens() {
             if(!factoryContract || !currentUserAddress) return;
 
@@ -227,43 +258,30 @@
             const listDiv = document.getElementById("tokensList");
 
             try {
+                const latestBlock = await provider.getBlockNumber();
+                const fromBlock = latestBlock - RPC_BLOCK_LIMIT; // Limita a busca aos últimos blocos
+
                 const filter = factoryContract.filters.TokenCreated();
-                const events = await factoryContract.queryFilter(filter);
+                const events = await factoryContract.queryFilter(filter, fromBlock);
 
                 const myTokens = events.filter(ev => ev.args[3].toLowerCase() === currentUserAddress.toLowerCase());
 
                 document.getElementById("loadingTokens").style.display = "none";
+                listDiv.innerHTML = ""; // Limpa antes de renderizar (se a injeção falhou antes)
 
                 if (myTokens.length === 0) {
-                    listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">Você ainda não criou nenhum token.</p>';
+                    listDiv.innerHTML = '<p style="color: #64748b; font-size: 0.9rem; text-align: center;">Nenhum token encontrado nesta carteira.</p>';
                     return;
                 }
-
-                listDiv.innerHTML = "";
                 
                 myTokens.reverse().forEach(ev => {
-                    const tokenAddr = ev.args[0];
-                    const tokenName = ev.args[1];
-                    const tokenSymbol = ev.args[2];
-
-                    const card = document.createElement("div");
-                    card.className = "token-card";
-                    card.innerHTML = `
-                        <div class="token-info">
-                            <h3>${tokenName} <span style="color:#a78bfa">($${tokenSymbol})</span></h3>
-                            <span>${tokenAddr.slice(0,6)}...${tokenAddr.slice(-4)}</span>
-                        </div>
-                        <div style="display:flex; gap:5px;">
-                            <a href="https://testnet.arcscan.app/token/${tokenAddr}" target="_blank" class="mini-btn" style="text-decoration:none;">🔍 Scan</a>
-                            <button onclick="watchToken('${tokenAddr}', '${tokenSymbol}')" class="mini-btn">🦊 Add</button>
-                        </div>
-                    `;
-                    listDiv.appendChild(card);
+                    injectTokenToDashboard(ev.args[0], ev.args[1], ev.args[2]);
                 });
 
             } catch (error) {
                 console.error("Erro ao buscar tokens:", error);
                 document.getElementById("loadingTokens").style.display = "none";
+                listDiv.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem; text-align: center;">⚠️ Erro: Falha ao carregar histórico (RPC/Rede).</p>';
                 log("Erro ao carregar histórico.");
             }
         }
