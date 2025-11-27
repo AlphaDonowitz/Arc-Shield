@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V42 - ANIMAÇÃO) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V43 - USDC Blue Animation) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -124,7 +124,7 @@
         .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: var(--accent-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
         .mini-btn:hover { background: var(--accent-color); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(39, 117, 202, 0.4); } 
 
-        /* ESTILO PARA GERENCIAMENTO DE TOKEN (V42) */
+        /* ESTILO PARA GERENCIAMENTO DE TOKEN (V43) */
         #tokenManagerSection { display: none; margin-top: 30px; }
         #managerCard { 
             padding: 2.5rem; 
@@ -132,7 +132,7 @@
             border: 1px solid var(--border-light); 
             border-radius: 24px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.5); 
-            transition: all 0.2s ease-out; /* Adicionado para a animação */
+            transition: all 0.2s ease-out; 
         }
         .manager-info-box { 
             background: rgba(0,0,0,0.3); 
@@ -192,15 +192,15 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .success-pulse { /* Animação na borda do card */
+        .success-pulse { /* ANIMAÇÃO ALTERADA PARA AZUL USDC (V43) */
             animation: pulse-success 0.5s ease-out;
-            border-color: #2ecc71 !important; /* Verde de sucesso */
-            box-shadow: 0 0 15px #2ecc71;
+            border-color: var(--accent-color) !important; 
+            box-shadow: 0 0 15px var(--accent-color);
         }
         @keyframes pulse-success {
-            0% { border-color: var(--border-light); box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
-            50% { border-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
-            100% { border-color: var(--border-light); box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+            0% { border-color: var(--border-light); box-shadow: 0 0 0 rgba(39, 117, 202, 0); }
+            50% { border-color: var(--accent-color); box-shadow: 0 0 15px rgba(39, 117, 202, 1); }
+            100% { border-color: var(--border-light); box-shadow: 0 0 0 rgba(39, 117, 202, 0); }
         }
 
 
@@ -382,7 +382,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
-        /* --- SISTEMA DE TRADUÇÃO (V42) --- */
+        /* --- SISTEMA DE TRADUÇÃO (V43) --- */
         const translations = {
             pt: {
                 heroDesc: "Crie tokens com velocidade e segurança na Arc Testnet da Circle",
@@ -746,7 +746,6 @@
             log(t.lblManagerTitle + `: ${symbol} carregado.`);
         }
         
-        // NOVO: Função para aplicar % no input de Transferência
         function setTransferAmount(percentage) {
             if (!currentManagedToken.address) {
                  alert(translations[currentLang].alertTokenSelect);
@@ -767,7 +766,7 @@
             document.getElementById('transferAmount').value = roundedAmount;
         }
 
-        // Função para Transferir Tokens (V42 - Com Animação)
+        // Função para Transferir Tokens (V43 - Com Animação em Azul)
         async function transferTokens() {
             if (!currentManagedToken.address) { alert(translations[currentLang].alertTokenSelect); return; }
             
@@ -810,7 +809,7 @@
                 await tx.wait();
                 log(t.logTransferSuccess);
                 
-                // 2. ANIMAÇÃO DE SUCESSO
+                // 2. ANIMAÇÃO DE SUCESSO (PULSO AZUL USDC)
                 managerCard.classList.add('success-pulse');
                 setTimeout(() => {
                     managerCard.classList.remove('success-pulse');
