@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V39 - TOKEN MANAGER) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V42 - ANIMAÇÃO) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -124,26 +124,86 @@
         .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: var(--accent-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
         .mini-btn:hover { background: var(--accent-color); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(39, 117, 202, 0.4); } 
 
-        /* ESTILO PARA GERENCIAMENTO DE TOKEN */
+        /* ESTILO PARA GERENCIAMENTO DE TOKEN (V42) */
         #tokenManagerSection { display: none; margin-top: 30px; }
-        .management-card { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-            padding: 15px; 
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
+        #managerCard { 
+            padding: 2.5rem; 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-light); 
+            border-radius: 24px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5); 
+            transition: all 0.2s ease-out; /* Adicionado para a animação */
         }
-        .info-box { 
+        .manager-info-box { 
             background: rgba(0,0,0,0.3); 
-            padding: 10px; 
-            border-radius: 8px; 
-            grid-column: span 2; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 25px; 
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .info-box span { color: var(--accent-color); font-weight: 600; }
+        .manager-info-box p { margin: 0; font-size: 0.95rem; }
+        .manager-info-box span { color: var(--accent-color); font-weight: 600; }
         
+        /* Controles Percentuais */
+        .transfer-controls { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: -15px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
+        .transfer-controls button {
+            flex: 1; 
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border-light);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .transfer-controls button:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: var(--accent-color);
+        }
+        .transfer-controls button.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 10px rgba(39, 117, 202, 0.4);
+        }
+        .transfer-controls button.active:hover {
+            background: var(--accent-color); 
+            opacity: 0.9;
+        }
+
+        /* ANIMAÇÕES (NOVAS) */
+        .processing-spinner { 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-left-color: white; 
+            border-radius: 50%; 
+            width: 14px; 
+            height: 14px; 
+            animation: spin 1s linear infinite; 
+            display: inline-block;
+            margin-right: 8px; 
+            vertical-align: middle;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .success-pulse { /* Animação na borda do card */
+            animation: pulse-success 0.5s ease-out;
+            border-color: #2ecc71 !important; /* Verde de sucesso */
+            box-shadow: 0 0 15px #2ecc71;
+        }
+        @keyframes pulse-success {
+            0% { border-color: var(--border-light); box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+            50% { border-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
+            100% { border-color: var(--border-light); box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+
         .footer-bar { 
             position: fixed; 
             bottom: 0; 
@@ -154,7 +214,6 @@
             backdrop-filter: blur(10px); 
             font-size: 0.8rem; 
             color: var(--text-muted); 
-            border-top: 1px solid rgba(255,255,255,0.05); 
             z-index: 100; 
             box-sizing: border-box; 
             display: flex; 
@@ -198,8 +257,8 @@
             #startScreen .btn-hero {
                  margin-bottom: 40px; 
             }
-            .management-card { grid-template-columns: 1fr; }
-            .info-box { grid-column: span 1; }
+            .transfer-controls { justify-content: space-between; gap: 8px; }
+            .transfer-controls button { flex-basis: 22%; padding: 8px; }
         }
     </style>
 </head>
@@ -262,14 +321,14 @@
                 </h2>
                 <div class="card" id="managerCard">
                     <p id="managerPlaceholder" style="color: var(--text-muted);">
-                        Selecione um token abaixo ou crie um novo para gerenciar.
+                        Selecione um token no histórico ou crie um novo para gerenciar.
                     </p>
 
                     <div id="tokenManagementForm" style="display:none;">
                         
-                        <div class="info-box">
+                        <div class="manager-info-box">
                             <p style="margin: 0 0 5px 0;"><span id="managerTokenName"></span> (<span id="managerTokenSymbol"></span>)</p>
-                            <p style="font-size: 0.8rem; margin: 0;">
+                            <p style="font-size: 0.95rem; margin: 0;">
                                 <span id="lblYourBalance">Seu Saldo:</span> <span id="currentBalance">...</span> 
                             </p>
                         </div>
@@ -277,6 +336,13 @@
                         <div style="grid-column: span 2;">
                             <label id="lblTransferAmount">Quantia a Transferir</label>
                             <input type="number" id="transferAmount" placeholder="0.00">
+                            
+                            <div class="transfer-controls">
+                                <button onclick="setTransferAmount(25)">25%</button>
+                                <button onclick="setTransferAmount(50)">50%</button>
+                                <button onclick="setTransferAmount(75)">75%</button>
+                                <button onclick="setTransferAmount(100)">MAX</button>
+                            </div>
 
                             <label id="lblRecipientAddress">Endereço do Destinatário</label>
                             <input type="text" id="recipientAddress" placeholder="0x...">
@@ -316,7 +382,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
-        /* --- SISTEMA DE TRADUÇÃO (V39 - TOKEN MANAGER) --- */
+        /* --- SISTEMA DE TRADUÇÃO (V42) --- */
         const translations = {
             pt: {
                 heroDesc: "Crie tokens com velocidade e segurança na Arc Testnet da Circle",
@@ -344,7 +410,7 @@
                 logSelectionCancelled: "Seleção cancelada.",
                 alertInstallMetaMask: "Nenhuma carteira detectada! Por favor, instale uma extensão (ex: MetaMask ou Rabby).",
                 logConnected: "Conectado:",
-                // NOVOS
+                // NOVOS - MANAGER
                 lblManagerTitle: "⚙️ Gerenciamento de Token",
                 managerPlaceholder: "Selecione um token no histórico ou crie um novo para gerenciar.",
                 lblYourBalance: "Seu Saldo:",
@@ -383,7 +449,7 @@
                 logSelectionCancelled: "Selection cancelled.",
                 alertInstallMetaMask: "No wallet detected! Please install an extension (e.g., MetaMask or Rabby).",
                 logConnected: "Connected:",
-                // NOVOS
+                // NOVOS - MANAGER
                 lblManagerTitle: "⚙️ Token Management",
                 managerPlaceholder: "Select a token from history or create a new one to manage.",
                 lblYourBalance: "Your Balance:",
@@ -402,11 +468,15 @@
         let provider, signer, factoryContract;
         let currentUserAddress;
         
-        // NOVO: Array para rastrear tokens criados na sessão
         let tokenHistory = []; 
-        let currentManagedToken = null; // Token atualmente selecionado para gerenciamento
+        let currentManagedToken = {
+            address: null, 
+            contract: null, 
+            balance: 0, 
+            decimals: 18, 
+            symbol: ''
+        }; 
         
-        // ABI simplificada do ERC-20 para funções de gestão (transfer, balanceOf)
         const erc20ABI = [
             "function transfer(address to, uint256 amount) returns (bool)",
             "function balanceOf(address account) view returns (uint256)",
@@ -417,7 +487,7 @@
         const contractAddress = "0x3Ed7Fd9b5a2a77B549463ea1263516635c77eB0a";
         const factoryContractABI = [
             { "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "initialSupply", "type": "uint256" } ], "name": "createToken", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-            { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "type": "event" }
+            { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "outputs": [], "stateMutability": "nonpayable", "type": "event" }
         ];
 
         /* --- SISTEMA DE TRADUÇÃO & INICIALIZAÇÃO --- */
@@ -426,13 +496,11 @@
             currentLang = lang;
             const t = translations[lang];
 
-            // FUNÇÃO AUXILIAR PARA ELEMENTOS QUE PODEM NÃO EXISTIR
             const updateText = (id, text) => {
                 const el = document.getElementById(id);
                 if (el) el.innerText = text;
             };
 
-            // Atualiza Textos Estáticos e Títulos
             updateText('heroDesc', t.heroDesc);
             updateText('btnStartText', t.btnStart);
             updateText('appSubtitle', t.appSubtitle);
@@ -451,8 +519,6 @@
             updateText('lblRecipientAddress', t.lblRecipientAddress);
             updateText('btnTransfer', t.btnTransfer);
 
-
-            // Atualiza Botões Dinâmicos (Complexos)
             const btnCreate = document.getElementById('btnCreate');
             if (btnCreate) {
                  if (btnCreate.disabled) {
@@ -475,10 +541,13 @@
                 }
             }
 
-            // Atualiza Botão de Idioma para mostrar a opção de troca
             const btnLang = document.getElementById('btnLang');
             if (btnLang) {
                 btnLang.innerText = lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'; 
+            }
+            
+            if (currentManagedToken.address) {
+                document.getElementById('currentBalance').innerText = `${currentManagedToken.balance} ${currentManagedToken.symbol}`;
             }
         }
 
@@ -486,7 +555,7 @@
             setLanguage(currentLang === 'pt' ? 'en' : 'pt');
         }
 
-        // --- DETECÇÃO AUTOMÁTICA & LÓGICA DE INICIALIZAÇÃO ---
+        /* --- DETECÇÃO AUTOMÁTICA & LÓGICA DE INICIALIZAÇÃO --- */
         (function() {
             const userLang = navigator.language || navigator.userLanguage;
             if (userLang.startsWith('en')) {
@@ -542,7 +611,6 @@
 
             provider = new ethers.BrowserProvider(window.ethereum);
             signer = await provider.getSigner();
-            // Factory Contract
             factoryContract = new ethers.Contract(contractAddress, factoryContractABI, signer);
 
             const btn = document.getElementById("btnConnect");
@@ -562,7 +630,6 @@
             btnCreate.disabled = false;
             btnCreate.innerText = t.btnCreate;
             
-            // Tenta renderizar o manager se já houver tokens no histórico
             if (tokenHistory.length > 0) {
                  renderTokenManager(tokenHistory[tokenHistory.length - 1].address);
             }
@@ -617,55 +684,54 @@
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
                 log(t.logSuccess);
 
-                // NOVO: Abre o gerenciador para o token recém-criado
                 if (tokenAddress) {
                     renderTokenManager(tokenAddress);
                 }
                 
             } catch (error) { 
-                console.error(error); 
+                console.error("Erro na Criação do Token:", error); 
                 const reason = error.reason || t.logTxCancelled;
                 log(`${t.logError}${reason}`); 
                 btn.innerText = t.btnCreate; btn.disabled = false; 
             }
         }
         
-        // NOVO: Adiciona a função para renderizar o Gerenciador de Token
         async function renderTokenManager(address) {
             if (!signer || !provider) { return; }
 
-            // 1. Instanciar o Contrato
             const tokenContract = new ethers.Contract(address, erc20ABI, signer);
-            currentManagedToken = { address, contract: tokenContract };
             const t = translations[currentLang];
             
-            // 2. Buscar Dados
             let balance = '...';
-            let decimals = 18; // Default
+            let decimals = 18; 
             let symbol = '';
             let name = '';
             
             try {
-                // Busca o saldo do usuário atual
                 const balanceBN = await tokenContract.balanceOf(currentUserAddress);
                 const tokenSymbol = await tokenContract.symbol();
                 const tokenDecimals = await tokenContract.decimals();
                 
-                // Formata o saldo
                 decimals = Number(tokenDecimals);
                 balance = ethers.formatUnits(balanceBN, decimals);
                 symbol = tokenSymbol;
 
-                // Busca o nome do histórico
                 const historyItem = tokenHistory.find(token => token.address === address);
-                name = historyItem ? historyItem.name : 'Unknown';
+                name = historyItem ? historyItem.name : 'Token';
+
+                currentManagedToken = { 
+                    address, 
+                    contract: tokenContract, 
+                    balance: parseFloat(balance), 
+                    decimals: decimals, 
+                    symbol: symbol
+                };
                 
             } catch (e) {
                 console.error("Erro ao buscar dados do token:", e);
                 balance = 'Erro';
             }
 
-            // 3. Atualizar UI
             document.getElementById('managerPlaceholder').style.display = 'none';
             document.getElementById('tokenManagementForm').style.display = 'block';
             document.getElementById('tokenManagerSection').style.display = 'block';
@@ -673,18 +739,42 @@
             document.getElementById('managerTokenName').innerText = name;
             document.getElementById('managerTokenSymbol').innerText = symbol;
             document.getElementById('currentBalance').innerText = `${balance} ${symbol}`;
+            
             document.getElementById('recipientAddress').value = '';
             document.getElementById('transferAmount').value = '';
             
             log(t.lblManagerTitle + `: ${symbol} carregado.`);
         }
         
-        // NOVO: Função para Transferir Tokens
+        // NOVO: Função para aplicar % no input de Transferência
+        function setTransferAmount(percentage) {
+            if (!currentManagedToken.address) {
+                 alert(translations[currentLang].alertTokenSelect);
+                 return;
+            }
+            
+            const totalBalance = currentManagedToken.balance;
+            let amount;
+            
+            if (percentage === 100) {
+                amount = totalBalance;
+            } else {
+                amount = totalBalance * (percentage / 100);
+            }
+            
+            const roundedAmount = parseFloat(amount.toFixed(6));
+            
+            document.getElementById('transferAmount').value = roundedAmount;
+        }
+
+        // Função para Transferir Tokens (V42 - Com Animação)
         async function transferTokens() {
-            if (!currentManagedToken) { alert(translations[currentLang].alertTokenSelect); return; }
+            if (!currentManagedToken.address) { alert(translations[currentLang].alertTokenSelect); return; }
             
             const recipient = document.getElementById('recipientAddress').value;
             const amountStr = document.getElementById('transferAmount').value;
+            const btnTransfer = document.getElementById('btnTransfer');
+            const managerCard = document.getElementById('managerCard');
             const t = translations[currentLang];
             
             if (!ethers.isAddress(recipient)) {
@@ -698,38 +788,53 @@
 
             const tokenContract = currentManagedToken.contract;
 
+            // 1. INÍCIO DO PROCESSAMENTO E SPINNER
+            const originalText = btnTransfer.innerText;
+            btnTransfer.innerHTML = `<span class="processing-spinner"></span> ${t.btnProcessing}`;
+            btnTransfer.disabled = true;
+
             try {
-                // 1. Buscar Decimais para formatar a quantia
-                const decimals = Number(await tokenContract.decimals());
-                const amountToSend = ethers.parseUnits(amountStr, decimals);
-                
-                // 2. Verificar Saldo (preventivo)
+                const amountToSend = ethers.parseUnits(amountStr, currentManagedToken.decimals);
                 const balanceBN = await tokenContract.balanceOf(currentUserAddress);
+                
                 if (amountToSend > balanceBN) {
                     alert(t.alertInsufficientBalance);
+                    btnTransfer.innerHTML = originalText; 
+                    btnTransfer.disabled = false;
                     return;
                 }
 
-                // 3. Enviar Transação
                 const tx = await tokenContract.transfer(recipient, amountToSend);
                 log(t.logTransferSent + ' ' + tx.hash.slice(0, 10) + '...');
                 
                 await tx.wait();
                 log(t.logTransferSuccess);
                 
-                // Atualiza o saldo após a transferência
-                renderTokenManager(currentManagedToken.address);
+                // 2. ANIMAÇÃO DE SUCESSO
+                managerCard.classList.add('success-pulse');
+                setTimeout(() => {
+                    managerCard.classList.remove('success-pulse');
+                }, 500); 
+
+                // 3. FINALIZAÇÃO
+                await renderTokenManager(currentManagedToken.address); 
+                
+                btnTransfer.innerHTML = originalText;
+                btnTransfer.disabled = false;
+
 
             } catch (error) {
                 console.error("Erro na Transferência:", error);
                 const reason = error.reason || t.logTxCancelled;
                 log(`${t.logError}${reason}`); 
+                
+                btnTransfer.innerHTML = originalText;
+                btnTransfer.disabled = false;
             }
         }
 
         // Função Antiga: Adiciona token ao Dashboard
         function injectTokenToDashboard(address, name, symbol) {
-             // NOVO: Adiciona ao histórico da sessão
              tokenHistory.push({ address, name, symbol });
 
              const listDiv = document.getElementById("tokensList");
