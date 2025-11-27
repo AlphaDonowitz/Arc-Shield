@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V43 - USDC Blue Animation) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V44 - CLEAN-UP) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -117,14 +117,29 @@
         .tokens-section { width: 100%; margin-top: 20px; }
         .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: white; display: flex; align-items: center; gap: 10px; }
         .token-list { display: grid; gap: 15px; }
-        .token-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease-in-out; } 
-        .token-card:hover { border-color: var(--accent-color); background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39, 117, 202, 0.2); } 
+        .token-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-light); 
+            border-radius: 16px; 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            transition: all 0.2s ease-in-out; 
+            cursor: pointer; /* Adicionado cursor pointer para indicar clicável */
+        } 
+        .token-card:hover { 
+            border-color: var(--accent-color); 
+            background: rgba(255, 255, 255, 0.08); 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(39, 117, 202, 0.2); 
+        } 
         .token-info h3 { margin: 0; font-size: 1rem; color: white; }
         .token-info span { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
         .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: var(--accent-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
         .mini-btn:hover { background: var(--accent-color); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(39, 117, 202, 0.4); } 
 
-        /* ESTILO PARA GERENCIAMENTO DE TOKEN (V43) */
+        /* ESTILO PARA GERENCIAMENTO DE TOKEN (V44) */
         #tokenManagerSection { display: none; margin-top: 30px; }
         #managerCard { 
             padding: 2.5rem; 
@@ -178,7 +193,7 @@
             opacity: 0.9;
         }
 
-        /* ANIMAÇÕES (NOVAS) */
+        /* ANIMAÇÕES */
         .processing-spinner { 
             border: 2px solid rgba(255,255,255,0.3); 
             border-left-color: white; 
@@ -192,7 +207,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .success-pulse { /* ANIMAÇÃO ALTERADA PARA AZUL USDC (V43) */
+        .success-pulse { 
             animation: pulse-success 0.5s ease-out;
             border-color: var(--accent-color) !important; 
             box-shadow: 0 0 15px var(--accent-color);
@@ -382,7 +397,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
-        /* --- SISTEMA DE TRADUÇÃO (V43) --- */
+        /* --- SISTEMA DE TRADUÇÃO (V44) --- */
         const translations = {
             pt: {
                 heroDesc: "Crie tokens com velocidade e segurança na Arc Testnet da Circle",
@@ -766,7 +781,7 @@
             document.getElementById('transferAmount').value = roundedAmount;
         }
 
-        // Função para Transferir Tokens (V43 - Com Animação em Azul)
+        // Função para Transferir Tokens (V44)
         async function transferTokens() {
             if (!currentManagedToken.address) { alert(translations[currentLang].alertTokenSelect); return; }
             
@@ -832,21 +847,24 @@
             }
         }
 
-        // Função Antiga: Adiciona token ao Dashboard
+        // Função Antiga: Adiciona token ao Dashboard (V44 - REMOÇÃO DO BOTÃO GERENCIAR)
         function injectTokenToDashboard(address, name, symbol) {
              tokenHistory.push({ address, name, symbol });
 
              const listDiv = document.getElementById("tokensList");
              const card = document.createElement("div");
              card.className = "token-card";
+             
+             // NOVO: Adiciona o evento de clique ao CARD inteiro para abrir o gerenciador
+             card.onclick = () => renderTokenManager(address);
+
              card.innerHTML = `
                  <div class="token-info">
                      <h3>${name} <span style="color:#2775CA">($${symbol})</span></h3>
                      <span>${address.slice(0,6)}...${address.slice(-4)}</span>
                  </div>
                  <div style="display:flex; gap:5px;">
-                     <button onclick="renderTokenManager('${address}')" class="mini-btn">⚙️ Gerenciar</button>
-                     <button onclick="watchToken('${address}', '${symbol}')" class="mini-btn">🦊 Add</button>
+                     <button onclick="event.stopPropagation(); watchToken('${address}', '${symbol}')" class="mini-btn">🦊 Add</button>
                  </div>
              `;
              listDiv.prepend(card);
