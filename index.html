@@ -6,7 +6,7 @@
     <title>Arc Shield - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS INSTITUCIONAIS (V37 - GLOBAL) --- */
+        /* --- ESTILOS INSTITUCIONAIS (V38 - MOBILE FIX) --- */
         :root {
             --bg-deep: #0A0A0A; 
             --text-main: #ffffff; 
@@ -27,7 +27,18 @@
             overflow-x: hidden; 
         }
         a { text-decoration: none; transition: 0.3s; }
-        .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; transition: opacity 0.5s ease; position: relative; box-sizing: border-box; }
+        .hero { 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px 20px; 
+            transition: opacity 0.5s ease; 
+            position: relative; 
+            box-sizing: border-box; 
+            /* Adicionado padding-bottom para dar espaço ao footer */
+            padding-bottom: 80px; 
+        }
         
         .badge { background: var(--card-bg); border: 1px solid var(--border-light); padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 24px; backdrop-filter: blur(5px); color: white; cursor: pointer; }
         .badge:hover { border-color: var(--accent-color); }
@@ -40,7 +51,15 @@
         .shield-gradient { color: var(--accent-color); } 
 
         .hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; text-align: center; }
-        #startScreen { display: flex; flex-direction: column; align-items: center; height: 70vh; justify-content: center; }
+        #startScreen { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            height: 70vh; 
+            justify-content: center; 
+            position: relative; 
+            z-index: 1; /* Garante que o conteúdo esteja acima */
+        }
 
         .btn-hero { 
             background: var(--accent-color); 
@@ -106,7 +125,23 @@
         .mini-btn { background: rgba(255, 255, 255, 0.1); border: none; color: var(--accent-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s ease-in-out; } 
         .mini-btn:hover { background: var(--accent-color); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(39, 117, 202, 0.4); } 
         
-        .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 25px; background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
+        .footer-bar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            padding: 15px 25px; 
+            background: rgba(10, 10, 10, 0.9); 
+            backdrop-filter: blur(10px); 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+            z-index: 100; 
+            box-sizing: border-box; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         .creator-link { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .creator-link:hover { color: #fff; }
         .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
@@ -120,7 +155,7 @@
 
         /* BOTÃO DE IDIOMA */
         .btn-lang {
-            position: absolute; top: 25px; right: 105px; /* Ao lado do Faucet */
+            position: absolute; top: 25px; right: 105px; 
             padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; 
             color: white; z-index: 10; background: rgba(255,255,255,0.1); 
             border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
@@ -135,8 +170,16 @@
             h1 { font-size: 2.5rem; } 
             .footer-bar { flex-direction: column; gap: 10px; text-align: center; } 
             .btn-faucet-header { position: relative; margin: 10px auto; right: auto; top: auto; } 
-            .btn-lang { position: relative; margin: 0 auto 10px auto; right: auto; top: auto; display: inline-block; }
+            .btn-lang { 
+                position: relative; 
+                margin: 0 auto 10px auto; 
+                right: auto; top: auto; display: inline-block; 
+            }
             .success-box { flex-direction: column; } 
+            /* Ajuste para garantir que o botão iniciar não seja coberto pelo footer */
+            #startScreen .btn-hero {
+                 margin-bottom: 40px; 
+            }
         }
     </style>
 </head>
@@ -220,7 +263,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
-        /* --- SISTEMA DE TRADUÇÃO (V37) --- */
+        /* --- SISTEMA DE TRADUÇÃO (V38 - REVISADO) --- */
         const translations = {
             pt: {
                 heroDesc: "Crie tokens com velocidade e segurança na Arc Testnet da Circle",
@@ -238,7 +281,16 @@
                 viewExplorer: "Ver no ArcScan ↗",
                 lblMyTokens: "📂 Meus Tokens Criados",
                 lblHistory: "O histórico é carregado apenas durante a sessão atual.",
-                viewMyTokens: "🌐 Ver Meus Tokens no Explorer"
+                viewMyTokens: "🌐 Ver Meus Tokens no Explorer",
+                alertFillFields: "Preencha todos os campos!",
+                alertSupplyZero: "O Supply deve ser maior que zero!",
+                logTxSent: "Transação enviada... aguardando confirmação.",
+                logSuccess: "Sucesso!",
+                logError: "Erro: ",
+                logTxCancelled: "Transação cancelada ou falha",
+                logSelectionCancelled: "Seleção cancelada.",
+                alertInstallMetaMask: "Nenhuma carteira detectada! Por favor, instale uma extensão (ex: MetaMask ou Rabby).",
+                logConnected: "Conectado:"
             },
             en: {
                 heroDesc: "Deploy tokens with speed and security on Circle's Arc Testnet",
@@ -256,7 +308,16 @@
                 viewExplorer: "View on ArcScan ↗",
                 lblMyTokens: "📂 Created Tokens",
                 lblHistory: "History is loaded for current session only.",
-                viewMyTokens: "🌐 View My Tokens on Explorer"
+                viewMyTokens: "🌐 View My Tokens on Explorer",
+                alertFillFields: "Please fill all fields!",
+                alertSupplyZero: "Supply must be greater than zero!",
+                logTxSent: "Transaction sent... awaiting confirmation.",
+                logSuccess: "Success!",
+                logError: "Error: ",
+                logTxCancelled: "Transaction cancelled or failed",
+                logSelectionCancelled: "Selection cancelled.",
+                alertInstallMetaMask: "No wallet detected! Please install an extension (e.g., MetaMask or Rabby).",
+                logConnected: "Connected:"
             }
         };
 
@@ -266,48 +327,106 @@
             currentLang = lang;
             const t = translations[lang];
 
-            // Atualiza Textos
-            document.getElementById('heroDesc').innerText = t.heroDesc;
-            document.getElementById('btnStartText').innerText = t.btnStart;
-            document.getElementById('appSubtitle').innerText = t.appSubtitle;
-            document.getElementById('lblProject').innerText = t.lblProject;
-            document.getElementById('lblSymbol').innerText = t.lblSymbol;
-            document.getElementById('lblSupply').innerText = t.lblSupply;
+            // Atualiza Textos (certificando-se de que os elementos existam)
+            const heroDescEl = document.getElementById('heroDesc');
+            if (heroDescEl) heroDescEl.innerText = t.heroDesc;
             
-            // Botões dinâmicos (precisa checar estado)
+            const btnStartTextEl = document.getElementById('btnStartText');
+            if (btnStartTextEl) btnStartTextEl.innerText = t.btnStart;
+            
+            const appSubtitleEl = document.getElementById('appSubtitle');
+            if (appSubtitleEl) appSubtitleEl.innerText = t.appSubtitle;
+            
+            const lblProjectEl = document.getElementById('lblProject');
+            if (lblProjectEl) lblProjectEl.innerText = t.lblProject;
+            
+            const lblSymbolEl = document.getElementById('lblSymbol');
+            if (lblSymbolEl) lblSymbolEl.innerText = t.lblSymbol;
+            
+            const lblSupplyEl = document.getElementById('lblSupply');
+            if (lblSupplyEl) lblSupplyEl.innerText = t.lblSupply;
+            
             const btnCreate = document.getElementById('btnCreate');
-            if (!btnCreate.disabled && btnCreate.innerText.includes('Criar')) btnCreate.innerText = t.btnCreate;
+            if (btnCreate) {
+                 if (btnCreate.disabled) {
+                    // Mantém o texto travado (Criar ou Deploy)
+                    btnCreate.innerText = t.btnCreate; 
+                 } else if (btnCreate.innerText.includes('Criar Outro') || btnCreate.innerText.includes('Deploy Another')) {
+                    // Se já criou e está no modo 'Criar Outro'
+                    btnCreate.innerText = t.btnCreateAnother;
+                 } else if (btnCreate.innerText.includes('Criar Token') || btnCreate.innerText.includes('Deploy Token')) {
+                     // Estado inicial ou após erro
+                     btnCreate.innerText = t.btnCreate;
+                 } else if (btnCreate.innerText.includes('Processando') || btnCreate.innerText.includes('Deploying')) {
+                     // Mantém o texto de processamento no novo idioma
+                     btnCreate.innerText = t.btnProcessing;
+                 }
+            }
             
             const btnConnect = document.getElementById('btnConnect');
-            if (!btnConnect.classList.contains('btn-disconnect')) btnConnect.innerText = t.btnConnect;
+            if (btnConnect) {
+                if (!btnConnect.classList.contains('btn-disconnect')) {
+                    btnConnect.innerText = t.btnConnect;
+                } else if (currentUserAddress) {
+                    // Se já estiver conectado, apenas atualiza o texto de 'Desconectar'
+                    btnConnect.innerHTML = `${t.btnDisconnect} (${currentUserAddress.slice(0,6)}...)`;
+                }
+            }
 
-            document.getElementById('msgSuccess').innerText = t.msgSuccess;
-            document.getElementById('txLink').innerText = t.viewExplorer;
-            document.getElementById('lblMyTokens').innerText = t.lblMyTokens;
-            document.getElementById('explorerLink').innerText = t.viewMyTokens;
+
+            const msgSuccessEl = document.getElementById('msgSuccess');
+            if (msgSuccessEl) msgSuccessEl.innerText = t.msgSuccess;
+            const txLinkEl = document.getElementById('txLink');
+            if (txLinkEl) txLinkEl.innerText = t.viewExplorer;
+            const lblMyTokensEl = document.getElementById('lblMyTokens');
+            if (lblMyTokensEl) lblMyTokensEl.innerText = t.lblMyTokens;
+            const explorerLinkEl = document.getElementById('explorerLink');
+            if (explorerLinkEl) explorerLinkEl.innerText = t.viewMyTokens;
 
             const hist = document.getElementById('lblHistory');
-            if(hist) hist.innerText = t.lblHistory;
+            if (hist) hist.innerText = t.lblHistory;
 
-            // Atualiza Botão de Idioma
+            // Atualiza Botão de Idioma para mostrar a opção de troca
             const btnLang = document.getElementById('btnLang');
-            btnLang.innerText = lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT';
+            if (btnLang) {
+                // Se o idioma ATUAL for PT, o botão mostra EN
+                btnLang.innerText = lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'; 
+            }
         }
 
         function toggleLanguage() {
             setLanguage(currentLang === 'pt' ? 'en' : 'pt');
         }
 
-        /* --- DETECÇÃO AUTOMÁTICA --- */
-        // Roda antes do window.onload para evitar "flash" de idioma errado
-        const userLang = navigator.language || navigator.userLanguage;
-        if (userLang.startsWith('en')) {
-            setLanguage('en');
-        } else {
-            setLanguage('pt');
-        }
+        /* --- DETECÇÃO AUTOMÁTICA (V38 - OTIMIZADO) --- */
+        (function() {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                currentLang = 'en';
+            } else {
+                currentLang = 'pt';
+            }
+            setLanguage(currentLang); 
+        })();
 
-        /* --- LÓGICA DAPP (Mantida da V36) --- */
+        // O restante da lógica DApp no window.onload
+        window.onload = async function() {
+            // Assegura que o texto do botão "Conectar" esteja no idioma correto na carga inicial
+            const btnConnect = document.getElementById('btnConnect');
+            if (btnConnect && !btnConnect.classList.contains('btn-disconnect')) {
+                btnConnect.innerText = translations[currentLang].btnConnect;
+            }
+
+            if (window.ethereum) {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts && accounts.length > 0) {
+                    startApp();
+                    setupConnection(accounts[0]);
+                }
+            }
+        };
+
+        /* --- LÓGICA DAPP --- */
         let provider, signer, factoryContract;
         let currentUserAddress;
         
@@ -317,16 +436,6 @@
             { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }, { "indexed": false, "internalType": "address", "name": "owner", "type": "address" } ], "name": "TokenCreated", "type": "event" }
         ];
 
-        window.onload = async function() {
-            if (window.ethereum) {
-                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                 if (accounts && accounts.length > 0) {
-                     startApp();
-                     setupConnection(accounts[0]);
-                 }
-            }
-        };
-
         function startApp() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('appContainer').style.display = 'flex';
@@ -335,7 +444,7 @@
         function log(msg) { document.getElementById("console").innerText = msg; }
 
         async function connectWallet() {
-            if (!window.ethereum) { alert("Instale a MetaMask!"); return; }
+            if (!window.ethereum) { alert(translations[currentLang].alertInstallMetaMask); return; }
             try {
                 await window.ethereum.request({
                     method: "wallet_requestPermissions",
@@ -347,13 +456,13 @@
                 }
             } catch (error) {
                 console.error("Erro Conexão:", error);
-                if (error.code === 4001) log("Seleção cancelada.");
+                if (error.code === 4001) log(translations[currentLang].logSelectionCancelled);
             }
         }
 
         async function setupConnection(address) {
             currentUserAddress = address;
-            log("Conectado: " + currentUserAddress);
+            log(`${translations[currentLang].logConnected}: ${currentUserAddress}`);
 
             provider = new ethers.BrowserProvider(window.ethereum);
             signer = await provider.getSigner();
@@ -374,7 +483,7 @@
             
             const btnCreate = document.getElementById("btnCreate");
             btnCreate.disabled = false;
-            btnCreate.innerText = t.btnCreate; // Reseta texto se estava em "Processando"
+            btnCreate.innerText = t.btnCreate;
         }
 
         async function disconnectWallet() { 
@@ -396,14 +505,14 @@
             const btn = document.getElementById("btnCreate");
             const t = translations[currentLang];
 
-            if(!name || !symbol || !supply) { alert("Preencha todos os campos!"); return; }
-            if(supply <= 0) { alert("O Supply deve ser maior que zero!"); return; }
+            if(!name || !symbol || !supply) { alert(t.alertFillFields); return; }
+            if(supply <= 0) { alert(t.alertSupplyZero); return; }
 
             btn.innerText = t.btnProcessing; btn.disabled = true;
 
             try {
                 const tx = await factoryContract.createToken(name, symbol, supply);
-                log("Transação enviada... aguardando confirmação.");
+                log(t.logTxSent);
                 
                 const receipt = await tx.wait(); 
                 
@@ -418,12 +527,12 @@
                 btn.innerText = t.btnCreateAnother; btn.disabled = false;
                 document.getElementById("resultArea").style.display = "flex"; 
                 document.getElementById("txLink").href = `https://testnet.arcscan.app/tx/${tx.hash}`;
-                log("Sucesso!");
+                log(t.logSuccess);
                 
             } catch (error) { 
                 console.error(error); 
-                const reason = error.reason || "Transação cancelada ou falha";
-                log("Erro: " + reason); 
+                const reason = error.reason || t.logTxCancelled;
+                log(`${t.logError}${reason}`); 
                 btn.innerText = t.btnCreate; btn.disabled = false; 
             }
         }
@@ -443,7 +552,6 @@
              `;
              listDiv.prepend(card);
              
-             // Remove placeholder se existir
              const placeholder = document.getElementById('lblHistory');
              if (placeholder) placeholder.style.display = 'none';
              
